@@ -1,8 +1,3 @@
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const withBundleAnalyzer = require("@next/bundle-analyzer")({
-  enabled: process.env.ANALYZE === "true",
-});
-
 /**
  * Run `build` or `dev` with `SKIP_ENV_VALIDATION` to skip env validation.
  * This is especially useful for Docker builds.
@@ -10,16 +5,8 @@ const withBundleAnalyzer = require("@next/bundle-analyzer")({
 !process.env.SKIP_ENV_VALIDATION && (await import("./src/env.mjs"));
 
 /** @type {import("next").NextConfig} */
-
-const nextConfig = {
+const config = {
   reactStrictMode: true,
-  images: {
-    domains: ["placehold.jp"],
-  },
-  compiler: {
-    removeConsole:
-      process.env.NODE_ENV === "production" ? { exclude: ["error"] } : false,
-  },
 
   /**
    * If you have the "experimental: { appDir: true }" setting enabled, then you
@@ -31,6 +18,12 @@ const nextConfig = {
     locales: ["ja"],
     defaultLocale: "ja",
   },
+  images: {
+    domains: ["placehold.jp"],
+  },
+  compiler: {
+    removeConsole:
+      process.env.NODE_ENV === "production" ? { exclude: ["error"] } : false,
+  },
 };
-
-module.exports = withBundleAnalyzer(nextConfig);
+export default config;
