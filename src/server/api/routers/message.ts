@@ -1,11 +1,11 @@
-import { messageFormSchema } from "~/models/prompt";
-import type { MessageType } from "~/models/prompt";
 import { createTRPCRouter, protectedProcedure } from "../trpc";
-import { env } from "~/env.mjs";
-import axios from "axios";
-import type { OpenAIResponse } from "~/models/openai";
-import { z } from "zod";
 import { TRPCError } from "@trpc/server";
+import axios from "axios";
+import { z } from "zod";
+import { env } from "~/env.mjs";
+import type { OpenAIResponse } from "~/models/openai";
+import type { MessageType } from "~/models/prompt";
+import { messageFormSchema } from "~/models/prompt";
 
 export const messageRouter = createTRPCRouter({
   createMessage: protectedProcedure
@@ -34,7 +34,6 @@ export const messageRouter = createTRPCRouter({
         );
 
         const content = response.data.choices[0]?.message.content;
-        content?.split("\n").filter((text: string) => text.trim().length > 0);
 
         if (!content || !messages[0]) {
           throw new TRPCError({

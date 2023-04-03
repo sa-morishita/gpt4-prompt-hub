@@ -1,15 +1,15 @@
-import { useState, type FC } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useState, type FC } from "react";
 import { useFieldArray, useForm } from "react-hook-form";
-import { messageFormSchema, promptFormSchema } from "~/models/prompt";
+import { toast } from "react-hot-toast";
+import { z } from "zod";
 import type {
   MessageFormType,
   MessageType,
   PromptFormType,
 } from "~/models/prompt";
+import { messageFormSchema, promptFormSchema } from "~/models/prompt";
 import { api } from "~/utils/api";
-import { toast } from "react-hot-toast";
-import { z } from "zod";
 
 type formType = PromptFormType & MessageFormType;
 const formSchema = z.intersection(promptFormSchema, messageFormSchema);
@@ -33,10 +33,6 @@ const PromptForm: FC = () => {
       ],
     },
   });
-
-  interface testtype {
-    user: number;
-  }
 
   const { fields, append } = useFieldArray({
     control,

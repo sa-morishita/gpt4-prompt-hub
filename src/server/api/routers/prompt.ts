@@ -1,7 +1,7 @@
-import { promptFormSchema } from "~/models/prompt";
 import { createTRPCRouter, protectedProcedure } from "../trpc";
-import { env } from "~/env.mjs";
 import { TRPCError } from "@trpc/server";
+import { env } from "~/env.mjs";
+import { promptFormSchema } from "~/models/prompt";
 
 export const promptRouter = createTRPCRouter({
   createPrompt: protectedProcedure

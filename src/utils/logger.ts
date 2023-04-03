@@ -1,5 +1,5 @@
-import pino from "pino";
 import type { DestinationStream } from "pino";
+import pino from "pino";
 import { logflarePinoVercel } from "pino-logflare";
 import { env } from "~/env.mjs";
 

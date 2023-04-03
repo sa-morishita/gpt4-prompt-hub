@@ -1,8 +1,8 @@
 import {
+  ArrowLeftOnRectangleIcon,
+  ArrowRightOnRectangleIcon,
   FolderIcon,
   HomeIcon,
-  ArrowRightOnRectangleIcon,
-  ArrowLeftOnRectangleIcon,
 } from "@heroicons/react/24/outline";
 import { signIn, signOut, useSession } from "next-auth/react";
 import Link from "next/link";
