@@ -4,7 +4,6 @@ import axios from "axios";
 import { z } from "zod";
 import { env } from "~/env.mjs";
 import type { OpenAIResponse } from "~/models/openai";
-import type { MessageType } from "~/models/prompt";
 import { messageFormSchema } from "~/models/prompt";
 
 export const messageRouter = createTRPCRouter({
@@ -22,8 +21,9 @@ export const messageRouter = createTRPCRouter({
           {
             model: env.OPENAI_API_MODEL,
             messages: fixed,
-            temperature: 0.8,
+            temperature: 1,
             max_tokens: 1000,
+            stream: true,
           },
           {
             headers: {
@@ -49,40 +49,40 @@ export const messageRouter = createTRPCRouter({
           messageIndex: messages.length,
         });
 
-        const messageCreate = async (message: MessageType) => {
-          const { role, content, exampleIndex, messageIndex } = message;
+        // const messageCreate = async (message: MessageType) => {
+        //   const { role, content, exampleIndex, messageIndex } = message;
 
-          await prisma.message.create({
-            data: {
-              role,
-              content,
-              exampleIndex,
-              messageIndex,
+        //   await prisma.message.create({
+        //     data: {
+        //       role,
+        //       content,
+        //       exampleIndex,
+        //       messageIndex,
 
-              prompt: {
-                connect: {
-                  id: promptId,
-                },
-              },
-            },
-          });
-        };
+        //       prompt: {
+        //         connect: {
+        //           id: promptId,
+        //         },
+        //       },
+        //     },
+        //   });
+        // };
 
-        // 初回（messages.length < 4）は全て保存、2回目以降は最後の2つだけ保存
-        const promiseArray = messages
-          .filter((message, index) => {
-            if (messages.length < 4) {
-              return message;
-            } else if (
-              index === messages.length - 2 ||
-              index === messages.length - 1
-            ) {
-              return message;
-            }
-          })
-          .map(messageCreate);
+        // // 初回（messages.length < 4）は全て保存、2回目以降は最後の2つだけ保存
+        // const promiseArray = messages
+        //   .filter((message, index) => {
+        //     if (messages.length < 4) {
+        //       return message;
+        //     } else if (
+        //       index === messages.length - 2 ||
+        //       index === messages.length - 1
+        //     ) {
+        //       return message;
+        //     }
+        //   })
+        //   .map(messageCreate);
 
-        await Promise.all(promiseArray);
+        // await Promise.all(promiseArray);
 
         return content;
       } catch (error) {
