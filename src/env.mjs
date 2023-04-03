@@ -22,6 +22,7 @@ const server = z.object({
   GOOGLE_CLIENT_ID: z.string(),
   GOOGLE_CLIENT_SECRET: z.string(),
   OPENAI_API_KEY: z.string(),
+  OPENAI_API_MODEL: z.string(),
 });
 
 /**
@@ -49,6 +50,7 @@ const processEnv = {
   NEXT_PUBLIC_LOGFLARE_API_KEY: process.env.NEXT_PUBLIC_LOGFLARE_API_KEY,
   NEXT_PUBLIC_LOGFLARE_SOURCE_ID: process.env.NEXT_PUBLIC_LOGFLARE_SOURCE_ID,
   OPENAI_API_KEY: process.env.OPENAI_API_KEY,
+  OPENAI_API_MODEL: process.env.OPENAI_API_MODEL,
   // NEXT_PUBLIC_CLIENTVAR: process.env.NEXT_PUBLIC_CLIENTVAR,
 };
 
