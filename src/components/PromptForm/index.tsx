@@ -405,11 +405,20 @@ const PromptForm: FC = () => {
           className="bg-blue-500 p-3 m-3"
           onClick={async () => {
             console.log("start");
+
+            const messages = [
+              { role: "system", content: "返事してください" },
+              { role: "user", content: "こんにちは" },
+            ];
+
             const apiResponse = await fetch("/api/openai/edgestream", {
               method: "POST",
               headers: {
                 "Content-Type": "application/json",
               },
+              body: JSON.stringify({
+                messages,
+              }),
             });
 
             console.log(apiResponse);

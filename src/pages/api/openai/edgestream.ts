@@ -1,18 +1,21 @@
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { OpenAI } from "openai-streams";
 import { env } from "~/env.mjs";
 
-export default async function handler() {
+export default async function handler(req: {
+  json: () => PromiseLike<{ messages: any }> | { messages: any };
+}) {
+  const { messages } = await req.json();
+
   const stream = await OpenAI(
     "chat",
     {
       model: "gpt-4",
-      messages: [
-        {
-          role: "system",
-          content: "人を楽しくさせる詩を50文字以内で書いてください",
-        },
-        { role: "user", content: "天気に関わるものでお願いします。" },
-      ],
+      messages,
     },
     { apiKey: env.OPENAI_API_KEY }
   );
