@@ -258,7 +258,7 @@ const PromptForm: FC = () => {
             await onSubmit(data);
           })}
         >
-          <div className="w-full">
+          {/* <div className="w-full">
             <div className="relative rounded-md rounded-b-none bg-white px-3 pb-1.5 pt-2.5 ring-1 ring-inset ring-gray-300 focus-within:z-10 focus-within:ring-2 focus-within:ring-indigo-600">
               <label
                 htmlFor="title"
@@ -297,7 +297,7 @@ const PromptForm: FC = () => {
             <p className="w-full pb-2 text-left text-sm text-red-500">
               {errors.description?.message}
             </p>
-          </div>
+          </div> */}
 
           {fields.map((field, index) => {
             if (index === 0 || index % 2 === 1)

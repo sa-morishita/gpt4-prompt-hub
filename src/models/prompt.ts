@@ -29,6 +29,6 @@ export interface PromptFormType {
 }
 
 export const promptFormSchema = z.object({
-  title: z.string().min(10),
-  description: z.string().min(10).max(500),
+  title: z.string(),
+  description: z.string(),
 }) satisfies z.ZodType<PromptFormType>;
