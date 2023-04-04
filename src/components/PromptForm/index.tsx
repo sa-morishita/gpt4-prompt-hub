@@ -16,6 +16,7 @@ const formSchema = z.intersection(promptFormSchema, messageFormSchema);
 const PromptForm: FC = () => {
   const [isSaved, setIsSaved] = useState<boolean>(false);
   const [promptId, setPromptId] = useState<string>("");
+  const [response2, setResponse2] = useState<string>("");
 
   const { isLoading, response, setResponse, error, fetchResponse } =
     useOpenAIApi();
@@ -88,6 +89,51 @@ const PromptForm: FC = () => {
         messageIndex: fields.length,
       });
 
+      const apiResponse = await fetch("/api/openai/edgestream", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          messages,
+        }),
+      });
+
+      if (!apiResponse.ok) {
+        throw new Error(apiResponse.statusText);
+      }
+
+      const data = apiResponse.body;
+      if (!data) {
+        throw new Error("データの取得に失敗しました。");
+      }
+      console.log(48109, apiResponse);
+
+      const reader = data.getReader();
+      const decoder = new TextDecoder();
+      let done = false;
+      let returnText = "";
+
+      while (!done) {
+        const { value, done: doneReading } = await reader.read();
+        done = doneReading;
+        const chunkValue = decoder.decode(value);
+
+        const formattedJsonString = `[${chunkValue.replace(/}{/g, "},{")}]`;
+
+        const object = JSON.parse(formattedJsonString) as {
+          content: string;
+        }[];
+
+        object.forEach((ob) => {
+          if (ob.content) {
+            console.log(67129, ob.content);
+            returnText = returnText + ob.content;
+            setResponse2((prev) => prev + ob.content);
+          }
+        });
+      }
+
       const content = await fetchResponse(fixedMessages);
 
       console.log(93, content);
@@ -131,6 +177,8 @@ const PromptForm: FC = () => {
       console.error(error);
     }
   };
+
+  console.log(181, response2);
 
   const addMessage = () => {
     append({
