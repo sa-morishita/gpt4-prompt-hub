@@ -55,6 +55,7 @@ const PromptForm: FC = () => {
 
   const onSubmit = async (formData: formType) => {
     const { title, description, messages } = formData;
+    setResponse("");
     // const messages = [
     //   { role: "system", content: "返事してください" },
     //   { role: "user", content: "こんにちは" },
@@ -97,12 +98,47 @@ const PromptForm: FC = () => {
     const reader = data.getReader();
     const decoder = new TextDecoder();
     let done = false;
+    let fixedText = "";
 
     while (!done) {
       const { value, done: doneReading } = await reader.read();
       done = doneReading;
       const chunkValue = decoder.decode(value);
       console.log(105, chunkValue);
+
+      if (chunkValue.startsWith("{") && chunkValue.endsWith("}")) {
+        const formattedJsonString = `[${chunkValue.replace(/}{/g, "},{")}]`;
+
+        const object = JSON.parse(formattedJsonString) as {
+          content: string;
+        }[];
+
+        object.forEach((ob) => {
+          if (ob.content) {
+            console.log(117, ob.content);
+            setResponse((prev) => prev + ob.content);
+          }
+        });
+        fixedText = "";
+      } else {
+        fixedText += chunkValue;
+
+        if (fixedText.startsWith("{") && fixedText.endsWith("}")) {
+          const formattedJsonString = `[${fixedText.replace(/}{/g, "},{")}]`;
+
+          const object = JSON.parse(formattedJsonString) as {
+            content: string;
+          }[];
+
+          object.forEach((ob) => {
+            if (ob.content) {
+              console.log(134, ob.content);
+              setResponse((prev) => prev + ob.content);
+            }
+          });
+          fixedText = "";
+        }
+      }
 
       // const formattedJsonString = `[${chunkValue.replace(/}{/g, "},{")}]`;
 
@@ -391,6 +427,7 @@ const PromptForm: FC = () => {
           )}
         </form>
       </div>
+      <div className="text-green-500">{response}</div>
     </div>
   );
 };
