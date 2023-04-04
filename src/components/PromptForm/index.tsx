@@ -57,126 +57,176 @@ const PromptForm: FC = () => {
     },
   });
 
-  const onSubmit = async (data: formType) => {
-    const { title, description, messages } = data;
+  const onSubmit = async (formData: formType) => {
+    const { title, description, messages } = formData;
+    // const messages = [
+    //   { role: "system", content: "返事してください" },
+    //   { role: "user", content: "こんにちは" },
+    // ];
 
-    try {
-      // let createdPromptId = "";
-      // if (fields.length === 2) {
-      //   const promptData = {
-      //     title,
-      //     description,
-      //   };
+    const apiResponse = await fetch("/api/openai/edgestream", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        messages,
+      }),
+    });
 
-      //   createdPromptId = await createPrompt.mutateAsync(promptData);
-      //   setPromptId(createdPromptId);
-      // }
-      setIsSaved(true);
+    console.log(apiResponse);
 
-      const fixedMessages = messages.map((message) => {
-        const { role, content, messageIndex } = message;
+    const data = apiResponse.body;
+    if (!data) {
+      throw new Error("データの取得に失敗しました。");
+    }
 
-        const systemPrompt = `${content}（一番最後に返答内容の真偽の自信度を（自信度:パーセント）で追加してください。）（返答は必ずマークダウン形式にしてください。）`;
+    const reader = data.getReader();
+    const decoder = new TextDecoder();
+    let done = false;
 
-        return { role, content: messageIndex === 0 ? systemPrompt : content };
-      });
+    while (!done) {
+      const { value, done: doneReading } = await reader.read();
+      done = doneReading;
+      const chunkValue = decoder.decode(value);
 
-      // fieldsにapiからのresponseを表示する欄を作る
-      append({
-        role: "assistant",
-        content: "",
-        exampleIndex: 0,
-        messageIndex: fields.length,
-      });
+      console.log(376, chunkValue);
 
-      const apiResponse = await fetch("/api/openai/edgestream", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          messages,
-        }),
-      });
+      const formattedJsonString = `[${chunkValue.replace(/}{/g, "},{")}]`;
 
-      if (!apiResponse.ok) {
-        throw new Error(apiResponse.statusText);
-      }
+      // const object = JSON.parse(formattedJsonString) as {
+      //   content: string;
+      // }[];
 
-      const data = apiResponse.body;
-      if (!data) {
-        throw new Error("データの取得に失敗しました。");
-      }
-      console.log(48109, apiResponse);
-
-      const reader = data.getReader();
-      const decoder = new TextDecoder();
-      let done = false;
-      let returnText = "";
-
-      while (!done) {
-        const { value, done: doneReading } = await reader.read();
-        done = doneReading;
-        const chunkValue = decoder.decode(value);
-
-        const formattedJsonString = `[${chunkValue.replace(/}{/g, "},{")}]`;
-
-        const object = JSON.parse(formattedJsonString) as {
-          content: string;
-        }[];
-
-        object.forEach((ob) => {
-          if (ob.content) {
-            console.log(67129, ob.content);
-            returnText = returnText + ob.content;
-            setResponse2((prev) => prev + ob.content);
-          }
-        });
-      }
-
-      const content = await fetchResponse(fixedMessages);
-
-      console.log(93, content);
-
-      // if (!content) throw new Error("返答がありませんでした。");
-
-      messages.push({
-        role: "assistant",
-        content: content || "",
-        exampleIndex: 0,
-        messageIndex: messages.length,
-      });
-
-      // 初回（messages.length < 4）は全て保存、2回目以降は最後の2つだけ保存
-      const createMessages = messages.filter((message, index) => {
-        if (messages.length < 4) {
-          return message;
-        } else if (
-          index === messages.length - 2 ||
-          index === messages.length - 1
-        ) {
-          return message;
-        }
-      });
-
-      // await createMessage.mutateAsync({
-      //   messages: createMessages,
-      //   promptId: promptId || createdPromptId,
+      // object.forEach((ob) => {
+      //   if (ob.content) {
+      //     returnText = returnText + ob.content;
+      //     console.log(returnText);
+      //   }
       // });
-
-      setResponse("");
-
-      // apiからのresponseのstreamが終わったらfieldsを更新
-      update(fields.length, {
-        role: "assistant",
-        content: content || "",
-        exampleIndex: 0,
-        messageIndex: fields.length,
-      });
-    } catch (error) {
-      console.error(error);
     }
   };
+
+  // const onSubmit = async (data: formType) => {
+  //   const { title, description, messages } = data;
+
+  //   try {
+  //     // let createdPromptId = "";
+  //     // if (fields.length === 2) {
+  //     //   const promptData = {
+  //     //     title,
+  //     //     description,
+  //     //   };
+
+  //     //   createdPromptId = await createPrompt.mutateAsync(promptData);
+  //     //   setPromptId(createdPromptId);
+  //     // }
+  //     setIsSaved(true);
+
+  //     const fixedMessages = messages.map((message) => {
+  //       const { role, content, messageIndex } = message;
+
+  //       const systemPrompt = `${content}（一番最後に返答内容の真偽の自信度を（自信度:パーセント）で追加してください。）（返答は必ずマークダウン形式にしてください。）`;
+
+  //       return { role, content: messageIndex === 0 ? systemPrompt : content };
+  //     });
+
+  //     // fieldsにapiからのresponseを表示する欄を作る
+  //     append({
+  //       role: "assistant",
+  //       content: "",
+  //       exampleIndex: 0,
+  //       messageIndex: fields.length,
+  //     });
+
+  //     const apiResponse = await fetch("/api/openai/edgestream", {
+  //       method: "POST",
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //       },
+  //       body: JSON.stringify({
+  //         messages,
+  //       }),
+  //     });
+
+  //     if (!apiResponse.ok) {
+  //       throw new Error(apiResponse.statusText);
+  //     }
+
+  //     const data = apiResponse.body;
+  //     if (!data) {
+  //       throw new Error("データの取得に失敗しました。");
+  //     }
+  //     console.log(48109, apiResponse);
+
+  //     const reader = data.getReader();
+  //     const decoder = new TextDecoder();
+  //     let done = false;
+  //     let returnText = "";
+
+  //     while (!done) {
+  //       const { value, done: doneReading } = await reader.read();
+  //       done = doneReading;
+  //       const chunkValue = decoder.decode(value);
+
+  //       const formattedJsonString = `[${chunkValue.replace(/}{/g, "},{")}]`;
+
+  //       const object = JSON.parse(formattedJsonString) as {
+  //         content: string;
+  //       }[];
+
+  //       object.forEach((ob) => {
+  //         if (ob.content) {
+  //           console.log(67129, ob.content);
+  //           returnText = returnText + ob.content;
+  //           setResponse2((prev) => prev + ob.content);
+  //         }
+  //       });
+  //     }
+
+  //     const content = await fetchResponse(fixedMessages);
+
+  //     console.log(93, content);
+
+  //     // if (!content) throw new Error("返答がありませんでした。");
+
+  //     messages.push({
+  //       role: "assistant",
+  //       content: content || "",
+  //       exampleIndex: 0,
+  //       messageIndex: messages.length,
+  //     });
+
+  //     // 初回（messages.length < 4）は全て保存、2回目以降は最後の2つだけ保存
+  //     const createMessages = messages.filter((message, index) => {
+  //       if (messages.length < 4) {
+  //         return message;
+  //       } else if (
+  //         index === messages.length - 2 ||
+  //         index === messages.length - 1
+  //       ) {
+  //         return message;
+  //       }
+  //     });
+
+  //     // await createMessage.mutateAsync({
+  //     //   messages: createMessages,
+  //     //   promptId: promptId || createdPromptId,
+  //     // });
+
+  //     setResponse("");
+
+  //     // apiからのresponseのstreamが終わったらfieldsを更新
+  //     update(fields.length, {
+  //       role: "assistant",
+  //       content: content || "",
+  //       exampleIndex: 0,
+  //       messageIndex: fields.length,
+  //     });
+  //   } catch (error) {
+  //     console.error(error);
+  //   }
+  // };
 
   console.log(181, response2);
 
