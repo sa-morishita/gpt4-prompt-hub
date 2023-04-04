@@ -90,11 +90,11 @@ const PromptForm: FC = () => {
 
       const content = await fetchResponse(fixedMessages);
 
-      if (!content) throw new Error("返答がありませんでした。");
+      // if (!content) throw new Error("返答がありませんでした。");
 
       messages.push({
         role: "assistant",
-        content,
+        content: content || "",
         exampleIndex: 0,
         messageIndex: messages.length,
       });
@@ -121,7 +121,7 @@ const PromptForm: FC = () => {
       // apiからのresponseのstreamが終わったらfieldsを更新
       update(fields.length, {
         role: "assistant",
-        content,
+        content: content || "",
         exampleIndex: 0,
         messageIndex: fields.length,
       });
