@@ -17,6 +17,7 @@ const PromptForm: FC = () => {
   const [isSaved, setIsSaved] = useState<boolean>(false);
   const [promptId, setPromptId] = useState<string>("");
   const [response2, setResponse2] = useState<string>("");
+  const [testaaas, setTestaaas] = useState<any[]>([]);
 
   const { isLoading, response, setResponse, error, fetchResponse } =
     useOpenAIApi();
@@ -64,13 +65,21 @@ const PromptForm: FC = () => {
     //   { role: "user", content: "こんにちは" },
     // ];
 
+    const fixedMessages = messages.map((message) => {
+      const { role, content, messageIndex } = message;
+
+      const systemPrompt = `${content}（一番最後に返答内容の真偽の自信度を（自信度:パーセント）で追加してください。）（返答は必ずマークダウン形式にしてください。）`;
+
+      return { role, content: messageIndex === 0 ? systemPrompt : content };
+    });
+
     const apiResponse = await fetch("/api/openai/edgestream", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        messages,
+        messages: fixedMessages,
       }),
     });
 
