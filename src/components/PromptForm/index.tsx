@@ -68,12 +68,14 @@ const PromptForm: FC = () => {
       return { role, content: messageIndex === 0 ? systemPrompt : content };
     });
 
-    append({
-      role: "assistant",
-      content: "",
-      exampleIndex: 0,
-      messageIndex: fields.length,
-    });
+    console.log(71, fixedMessages);
+
+    // append({
+    //   role: "assistant",
+    //   content: "",
+    //   exampleIndex: 0,
+    //   messageIndex: fields.length,
+    // });
 
     const apiResponse = await fetch("/api/openai/edgestream", {
       method: "POST",
@@ -85,7 +87,7 @@ const PromptForm: FC = () => {
       }),
     });
 
-    console.log(apiResponse);
+    console.log(88, apiResponse);
 
     const data = apiResponse.body;
     if (!data) {
