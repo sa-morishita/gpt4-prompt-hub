@@ -3,7 +3,7 @@ import { OpenAI } from "openai-streams";
 import { env } from "~/env.mjs";
 import type { MessageType } from "~/models/prompt";
 
-const handler = async (req: NextRequest) => {
+export default async function handler(req: NextRequest) {
   const { messages } = (await req.json()) as {
     messages: Omit<MessageType, "exampleIndex" | "messageIndex">[];
   };
@@ -17,18 +17,14 @@ const handler = async (req: NextRequest) => {
   const stream = await OpenAI(
     "chat",
     {
-      model: env.OPENAI_API_MODEL,
-      temperature: 1,
-      frequency_penalty: 0,
+      model: "gpt-4",
       messages,
     },
     { apiKey: env.OPENAI_API_KEY }
   );
 
   return new Response(stream);
-};
-
-export default handler;
+}
 
 export const config = {
   runtime: "edge",
