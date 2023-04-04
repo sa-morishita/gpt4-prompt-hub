@@ -63,9 +63,9 @@ const PromptForm: FC = () => {
     const fixedMessages = messages.map((message) => {
       const { role, content, messageIndex } = message;
 
-      const systemPrompt = `${content}（一番最後に返答内容の真偽の自信度を（自信度:パーセント）で追加してください。）（返答は必ずマークダウン形式にしてください。）`;
+      // const systemPrompt = `${content}（一番最後に返答内容の真偽の自信度を（自信度:パーセント）で追加してください。）（返答は必ずマークダウン形式にしてください。）`;
 
-      return { role, content: messageIndex === 0 ? systemPrompt : content };
+      return { role, content };
     });
 
     console.log(71, fixedMessages);
@@ -102,6 +102,7 @@ const PromptForm: FC = () => {
       const { value, done: doneReading } = await reader.read();
       done = doneReading;
       const chunkValue = decoder.decode(value);
+      console.log(105, chunkValue);
 
       const formattedJsonString = `[${chunkValue.replace(/}{/g, "},{")}]`;
 
