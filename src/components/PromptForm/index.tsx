@@ -1,7 +1,5 @@
 import Markdown from "../Markdown";
-import { useOpenAIApi } from "./hooks";
 import { zodResolver } from "@hookform/resolvers/zod";
-import axios from "axios";
 import { useState, type FC } from "react";
 import { useFieldArray, useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
@@ -16,11 +14,8 @@ const formSchema = z.intersection(promptFormSchema, messageFormSchema);
 const PromptForm: FC = () => {
   const [isSaved, setIsSaved] = useState<boolean>(false);
   const [promptId, setPromptId] = useState<string>("");
-  const [response2, setResponse2] = useState<string>("");
-  const [testaaas, setTestaaas] = useState<any[]>([]);
-
-  const { isLoading, response, setResponse, error, fetchResponse } =
-    useOpenAIApi();
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [response, setResponse] = useState<string>("");
 
   const {
     register,
@@ -73,6 +68,13 @@ const PromptForm: FC = () => {
       return { role, content: messageIndex === 0 ? systemPrompt : content };
     });
 
+    append({
+      role: "assistant",
+      content: "",
+      exampleIndex: 0,
+      messageIndex: fields.length,
+    });
+
     const apiResponse = await fetch("/api/openai/edgestream", {
       method: "POST",
       headers: {
@@ -99,20 +101,18 @@ const PromptForm: FC = () => {
       done = doneReading;
       const chunkValue = decoder.decode(value);
 
-      console.log(376, chunkValue);
-
       const formattedJsonString = `[${chunkValue.replace(/}{/g, "},{")}]`;
 
-      // const object = JSON.parse(formattedJsonString) as {
-      //   content: string;
-      // }[];
+      const object = JSON.parse(formattedJsonString) as {
+        content: string;
+      }[];
 
-      // object.forEach((ob) => {
-      //   if (ob.content) {
-      //     returnText = returnText + ob.content;
-      //     console.log(returnText);
-      //   }
-      // });
+      object.forEach((ob) => {
+        if (ob.content) {
+          console.log(ob.content);
+          setResponse((prev) => prev + ob.content);
+        }
+      });
     }
   };
 
@@ -236,8 +236,6 @@ const PromptForm: FC = () => {
   //     console.error(error);
   //   }
   // };
-
-  console.log(181, response2);
 
   const addMessage = () => {
     append({
@@ -389,249 +387,6 @@ const PromptForm: FC = () => {
             </div>
           )}
         </form>
-      </div>
-      <div>
-        <button
-          type="button"
-          className="bg-green-500 p-3 m-3"
-          onClick={async () => {
-            console.log("start");
-            const text1 = "explore";
-
-            const response = await axios.post("/api/openai/getWordInfo", {
-              prompt: text1,
-            });
-
-            console.log(response);
-          }}
-        >
-          wordwiseapi
-        </button>
-      </div>
-      <div>
-        <button
-          type="button"
-          className="bg-purple-500 p-3 m-3"
-          onClick={async () => {
-            console.log("start");
-            const response = await fetch("/api/openai/test", {
-              method: "POST",
-              body: JSON.stringify({ searched: "こんにちは" }),
-              headers: {
-                "content-type": "application/json",
-              },
-            });
-            console.log(313, response);
-            let searchResponse = "";
-            let endStream = false;
-            let loading = true;
-
-            if (response.ok) {
-              try {
-                const data = response.body;
-                if (!data) {
-                  return;
-                }
-                const reader = data.getReader();
-                const decoder = new TextDecoder();
-                while (true) {
-                  const { value, done } = await reader.read();
-                  const chunkValue = decoder.decode(value);
-                  console.log("searchResponse", searchResponse);
-                  searchResponse += chunkValue;
-                  if (done) {
-                    endStream = true;
-                    break;
-                  }
-                }
-              } catch (err) {
-                console.log("error1");
-              }
-            } else {
-              console.log("error2");
-            }
-            loading = false;
-          }}
-        >
-          getrecommendation
-        </button>
-      </div>
-      <div>
-        <button
-          type="button"
-          className="bg-orange-500 p-3 m-3"
-          onClick={async () => {
-            console.log("start");
-            const apiResponse = await fetch("/api/openai/nodegenerate", {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-              },
-            });
-            console.log(apiResponse);
-
-            const data = apiResponse.body;
-            if (!data) {
-              throw new Error("データの取得に失敗しました。");
-            }
-
-            const reader = data.getReader();
-            const decoder = new TextDecoder();
-            let done = false;
-
-            while (!done) {
-              const { value, done: doneReading } = await reader.read();
-              done = doneReading;
-              const chunkValue = decoder.decode(value);
-
-              console.log(376, chunkValue);
-
-              const formattedJsonString = `[${chunkValue.replace(
-                /}{/g,
-                "},{"
-              )}]`;
-
-              // const object = JSON.parse(formattedJsonString) as {
-              //   content: string;
-              // }[];
-
-              // object.forEach((ob) => {
-              //   if (ob.content) {
-              //     returnText = returnText + ob.content;
-              //     console.log(returnText);
-              //   }
-              // });
-            }
-          }}
-        >
-          wordwiseapi
-        </button>
-      </div>
-
-      <div>
-        <button
-          type="button"
-          className="bg-blue-500 p-3 m-3"
-          onClick={async () => {
-            console.log("start");
-
-            const messages = [
-              { role: "system", content: "返事してください" },
-              { role: "user", content: "こんにちは" },
-            ];
-
-            const apiResponse = await fetch("/api/openai/edgestream", {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify({
-                messages,
-              }),
-            });
-
-            console.log(apiResponse);
-
-            const data = apiResponse.body;
-            if (!data) {
-              throw new Error("データの取得に失敗しました。");
-            }
-
-            const reader = data.getReader();
-            const decoder = new TextDecoder();
-            let done = false;
-
-            while (!done) {
-              const { value, done: doneReading } = await reader.read();
-              done = doneReading;
-              const chunkValue = decoder.decode(value);
-
-              console.log(376, chunkValue);
-
-              const formattedJsonString = `[${chunkValue.replace(
-                /}{/g,
-                "},{"
-              )}]`;
-
-              // const object = JSON.parse(formattedJsonString) as {
-              //   content: string;
-              // }[];
-
-              // object.forEach((ob) => {
-              //   if (ob.content) {
-              //     returnText = returnText + ob.content;
-              //     console.log(returnText);
-              //   }
-              // });
-            }
-          }}
-        >
-          wordwiseapi
-        </button>
-      </div>
-      <div>
-        <button
-          type="button"
-          className="bg-blue-500 p-3 m-3"
-          onClick={async () => {
-            console.log("start");
-
-            const messages = [
-              { role: "system", content: "返事してください" },
-              { role: "user", content: "こんにちは" },
-            ];
-
-            const apiResponse = await fetch("/api/openai/generate", {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify({
-                messages,
-              }),
-            });
-            console.log(apiResponse);
-
-            if (!apiResponse.ok) {
-              throw new Error(apiResponse.statusText);
-            }
-
-            const data = apiResponse.body;
-            if (!data) {
-              throw new Error("データの取得に失敗しました。");
-            }
-
-            const reader = data.getReader();
-            const decoder = new TextDecoder();
-            let done = false;
-            let returnText = "";
-
-            while (!done) {
-              const { value, done: doneReading } = await reader.read();
-              done = doneReading;
-              const chunkValue = decoder.decode(value);
-
-              const formattedJsonString = `[${chunkValue.replace(
-                /}{/g,
-                "},{"
-              )}]`;
-
-              const object = JSON.parse(formattedJsonString) as {
-                content: string;
-              }[];
-
-              object.forEach((ob) => {
-                if (ob.content) {
-                  console.log(ob.content);
-                  returnText = returnText + ob.content;
-                  setResponse((prev) => prev + ob.content);
-                }
-              });
-            }
-          }}
-        >
-          wordwiseapi
-        </button>
       </div>
     </div>
   );
