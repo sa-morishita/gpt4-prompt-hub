@@ -78,13 +78,13 @@ const PromptForm: FC = () => {
     //   messageIndex: fields.length,
     // });
 
-    const apiResponse = await fetch("/api/openai/edgestream", {
+    const apiResponse = await fetch("/api/openai/edgetest", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        messages: fixedMessages,
+        prompt: "日本は好きですか？",
       }),
     });
 
@@ -98,7 +98,7 @@ const PromptForm: FC = () => {
     const reader = data.getReader();
     const decoder = new TextDecoder();
     let done = false;
-    let fixedText = "";
+    const fixedText = "";
 
     while (!done) {
       const { value, done: doneReading } = await reader.read();
@@ -106,39 +106,39 @@ const PromptForm: FC = () => {
       const chunkValue = decoder.decode(value);
       console.log(105, chunkValue);
 
-      if (chunkValue.startsWith("{") && chunkValue.endsWith("}")) {
-        const formattedJsonString = `[${chunkValue.replace(/}{/g, "},{")}]`;
+      // if (chunkValue.startsWith("{") && chunkValue.endsWith("}")) {
+      //   const formattedJsonString = `[${chunkValue.replace(/}{/g, "},{")}]`;
 
-        const object = JSON.parse(formattedJsonString) as {
-          content: string;
-        }[];
+      //   const object = JSON.parse(formattedJsonString) as {
+      //     content: string;
+      //   }[];
 
-        object.forEach((ob) => {
-          if (ob.content) {
-            console.log(117, ob.content);
-            setResponse((prev) => prev + ob.content);
-          }
-        });
-        fixedText = "";
-      } else {
-        fixedText += chunkValue;
+      //   object.forEach((ob) => {
+      //     if (ob.content) {
+      //       console.log(117, ob.content);
+      //       setResponse((prev) => prev + ob.content);
+      //     }
+      //   });
+      //   fixedText = "";
+      // } else {
+      //   fixedText += chunkValue;
 
-        if (fixedText.startsWith("{") && fixedText.endsWith("}")) {
-          const formattedJsonString = `[${fixedText.replace(/}{/g, "},{")}]`;
+      //   if (fixedText.startsWith("{") && fixedText.endsWith("}")) {
+      //     const formattedJsonString = `[${fixedText.replace(/}{/g, "},{")}]`;
 
-          const object = JSON.parse(formattedJsonString) as {
-            content: string;
-          }[];
+      //     const object = JSON.parse(formattedJsonString) as {
+      //       content: string;
+      //     }[];
 
-          object.forEach((ob) => {
-            if (ob.content) {
-              console.log(134, ob.content);
-              setResponse((prev) => prev + ob.content);
-            }
-          });
-          fixedText = "";
-        }
-      }
+      //     object.forEach((ob) => {
+      //       if (ob.content) {
+      //         console.log(134, ob.content);
+      //         setResponse((prev) => prev + ob.content);
+      //       }
+      //     });
+      //     fixedText = "";
+      //   }
+      // }
 
       // const formattedJsonString = `[${chunkValue.replace(/}{/g, "},{")}]`;
 
