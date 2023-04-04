@@ -104,18 +104,18 @@ const PromptForm: FC = () => {
       const chunkValue = decoder.decode(value);
       console.log(105, chunkValue);
 
-      const formattedJsonString = `[${chunkValue.replace(/}{/g, "},{")}]`;
+      // const formattedJsonString = `[${chunkValue.replace(/}{/g, "},{")}]`;
 
-      const object = JSON.parse(formattedJsonString) as {
-        content: string;
-      }[];
+      // const object = JSON.parse(formattedJsonString) as {
+      //   content: string;
+      // }[];
 
-      object.forEach((ob) => {
-        if (ob.content) {
-          console.log(ob.content);
-          setResponse((prev) => prev + ob.content);
-        }
-      });
+      // object.forEach((ob) => {
+      //   if (ob.content) {
+      //     console.log(ob.content);
+      //     setResponse((prev) => prev + ob.content);
+      //   }
+      // });
     }
   };
 
