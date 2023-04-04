@@ -27,7 +27,7 @@ export const useOpenAIApi = (): UseOpenAIApiResult => {
       try {
         logger.info("hooks messages", messages);
 
-        const apiResponse = await fetch("/api/openai/generate", {
+        const apiResponse = await fetch("/api/openai/edgestream", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",

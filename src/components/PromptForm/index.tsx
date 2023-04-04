@@ -60,16 +60,16 @@ const PromptForm: FC = () => {
     const { title, description, messages } = data;
 
     try {
-      let createdPromptId = "";
-      if (fields.length === 2) {
-        const promptData = {
-          title,
-          description,
-        };
+      // let createdPromptId = "";
+      // if (fields.length === 2) {
+      //   const promptData = {
+      //     title,
+      //     description,
+      //   };
 
-        createdPromptId = await createPrompt.mutateAsync(promptData);
-        setPromptId(createdPromptId);
-      }
+      //   createdPromptId = await createPrompt.mutateAsync(promptData);
+      //   setPromptId(createdPromptId);
+      // }
       setIsSaved(true);
 
       const fixedMessages = messages.map((message) => {
@@ -89,6 +89,8 @@ const PromptForm: FC = () => {
       });
 
       const content = await fetchResponse(fixedMessages);
+
+      console.log(93, content);
 
       // if (!content) throw new Error("返答がありませんでした。");
 
@@ -111,10 +113,10 @@ const PromptForm: FC = () => {
         }
       });
 
-      await createMessage.mutateAsync({
-        messages: createMessages,
-        promptId: promptId || createdPromptId,
-      });
+      // await createMessage.mutateAsync({
+      //   messages: createMessages,
+      //   promptId: promptId || createdPromptId,
+      // });
 
       setResponse("");
 
