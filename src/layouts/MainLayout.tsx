@@ -20,7 +20,7 @@ const MainLayout: FC<Props> = ({ children }: React.PropsWithChildren) => {
       <main>
         <div className="flex">
           <Sidebar />
-          <main className="h-screen w-3/4 bg-gray-100">{children}</main>
+          <main className="h-screen w-3/4 bg-gray-200">{children}</main>
         </div>
       </main>
     </>

@@ -1,16 +1,8 @@
+import Markdown from "../Markdown";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useState, type FC } from "react";
 import { useFieldArray, useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
-import ReactMarkdown from "react-markdown";
-import type { CodeComponent } from "react-markdown/lib/ast-to-react";
-import SyntaxHighlighter from "react-syntax-highlighter";
-import { dark } from "react-syntax-highlighter/dist/esm/styles/hljs";
-import rehypeMathjax from "rehype-mathjax";
-import rehypeRaw from "rehype-raw";
-import rehypeSanitize from "rehype-sanitize";
-import remarkGfm from "remark-gfm";
-import remarkMath from "remark-math";
 import { z } from "zod";
 import type { MessageFormType, PromptFormType } from "~/models/prompt";
 import { messageFormSchema, promptFormSchema } from "~/models/prompt";
@@ -154,23 +146,6 @@ const PromptForm: FC = () => {
     setLoading(false);
   };
 
-  const CodeBlock: CodeComponent = ({ inline, className, children }) => {
-    if (inline) {
-      return <code className={className}>{children}</code>;
-    }
-    const match = /language-(\w+)/.exec(className || "");
-    const lang = match && match[1] ? match[1] : "";
-    return (
-      <SyntaxHighlighter
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-        style={dark}
-        language={lang}
-        // eslint-disable-next-line react/no-children-prop
-        children={String(children).replace(/\n$/, "")}
-      />
-    );
-  };
-
   return (
     <div className="p-8 h-screen overflow-y-scroll w-full">
       <div className="max-w-2xl mx-auto w-full">
@@ -280,17 +255,19 @@ const PromptForm: FC = () => {
             );
           })}
           {fields.length % 2 === 0 ? (
-            <div className="mx-auto w-full space-y-3 text-center">
+            <div className="">
               <button
-                type="submit"
-                className="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+                className="relative overflow-hidden rounded-lg bg-black px-28 py-6 ring-red-500/50 ring-offset-black will-change-transform focus:outline-none focus:ring-1 focus:ring-offset-2"
                 disabled={createPrompt.isLoading || createMessage.isLoading}
               >
-                AIからの応答を生成
+                <span className="absolute inset-px z-10 grid place-items-center rounded-lg bg-black bg-gradient-to-t from-neutral-800 text-neutral-200">
+                  AIからの応答を生成
+                </span>
+                <span
+                  aria-hidden
+                  className="absolute inset-0 z-0 scale-x-[2.0] blur before:absolute before:inset-0 before:top-1/2 before:aspect-square before:animate-disco before:bg-gradient-conic before:from-purple-700 before:via-red-500 before:to-amber-400"
+                />
               </button>
-              <p className="text-sm text-gray-600">
-                ※2023/4/1時点では20秒以上かかる時があります
-              </p>
             </div>
           ) : (
             <div className="mx-auto w-full text-center">
@@ -312,7 +289,7 @@ const PromptForm: FC = () => {
         {/* ………………………………………………… */}
         {!loading ? (
           <button
-            className="w-full rounded-xl bg-neutral-900 px-4 py-2 font-medium text-white hover:bg-black/80"
+            className="w-full rounded-xl bg-neutral-900 px-4 py-2 font-medium text-white hover:bg-black/80 mt-9"
             onClick={(e) => generateResponse(e)}
           >
             Generate Response &rarr;
@@ -327,45 +304,7 @@ const PromptForm: FC = () => {
         )}
         {response && (
           <div className="mt-8 rounded-xl border bg-white p-4 shadow-md transition hover:bg-gray-100">
-            {/* <textarea
-              cols={10}
-              rows={20}
-              className="block w-full border-0 p-0 text-gray-900 placeholder:text-gray-400 sm:text-sm sm:leading-6"
-              value={response}
-              disabled
-            /> */}
-            {/* <ReactMarkdown>{markdown}</ReactMarkdown> */}
-
-            <ReactMarkdown
-              rehypePlugins={[rehypeRaw, rehypeSanitize, rehypeMathjax]}
-              remarkPlugins={[remarkGfm, remarkMath]}
-              components={{
-                code: CodeBlock,
-                table({ children }) {
-                  return (
-                    <table className="border-collapse border border-black py-1 px-3 dark:border-white">
-                      {children}
-                    </table>
-                  );
-                },
-                th({ children }) {
-                  return (
-                    <th className="break-words border border-black bg-gray-500 py-1 px-3 text-white dark:border-white">
-                      {children}
-                    </th>
-                  );
-                },
-                td({ children }) {
-                  return (
-                    <td className="break-words border border-black py-1 px-3 dark:border-white">
-                      {children}
-                    </td>
-                  );
-                },
-              }}
-            >
-              {response}
-            </ReactMarkdown>
+            <Markdown response={response} />
           </div>
         )}
       </div>
