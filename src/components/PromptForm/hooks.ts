@@ -1,5 +1,6 @@
 import { useCallback, useState } from "react";
 import type { MessageType } from "~/models/prompt";
+import logger from "~/utils/logger";
 
 interface UseOpenAIApiResult {
   isLoading: boolean;
@@ -24,6 +25,8 @@ export const useOpenAIApi = (): UseOpenAIApiResult => {
       setError(null);
 
       try {
+        logger.info("hooks messages", messages);
+
         const apiResponse = await fetch("/api/openai/generate", {
           method: "POST",
           headers: {
@@ -66,6 +69,7 @@ export const useOpenAIApi = (): UseOpenAIApiResult => {
             }
           });
         }
+        logger.info("hooks returnText", returnText);
 
         return returnText;
       } catch (error) {
