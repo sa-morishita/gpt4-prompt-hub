@@ -32,7 +32,7 @@ const Markdown: FC<Props> = ({ response }) => {
   };
 
   const CustomTable = ({ children }: CustomComponentProps) => (
-    <table className="divide-y divide-gray-300 bg-slate-100">{children}</table>
+    <table className="divide-y divide-gray-300 bg-slate-50">{children}</table>
   );
 
   const CustomThead = ({ children }: CustomComponentProps) => (

@@ -1,4 +1,5 @@
 import Markdown from "../Markdown";
+import { useOpenAIApi } from "./hooks";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useState, type FC } from "react";
 import { useFieldArray, useForm } from "react-hook-form";
@@ -15,6 +16,9 @@ const PromptForm: FC = () => {
   const [isSaved, setIsSaved] = useState<boolean>(false);
   const [promptId, setPromptId] = useState<string>("");
 
+  const { isLoading, response, setResponse, error, fetchResponse } =
+    useOpenAIApi();
+
   const {
     register,
     handleSubmit,
@@ -28,9 +32,10 @@ const PromptForm: FC = () => {
         { role: "user", content: "", exampleIndex: 0, messageIndex: 1 },
       ],
     },
+    mode: "onBlur",
   });
 
-  const { fields, append } = useFieldArray({
+  const { fields, append, update } = useFieldArray({
     control,
     name: "messages",
   });
@@ -41,7 +46,7 @@ const PromptForm: FC = () => {
     },
   });
 
-  const createMessage = api.message.createMessage.useMutation({
+  const createMessage = api.message.createMessages.useMutation({
     onSuccess: () => {
       toast.success("登録しました!");
     },
@@ -66,12 +71,54 @@ const PromptForm: FC = () => {
       }
       setIsSaved(true);
 
-      const content = await createMessage.mutateAsync({
-        messages,
+      const fixedMessages = messages.map((message) => {
+        const { role, content, messageIndex } = message;
+
+        const systemPrompt = `${content}（一番最後に返答内容の真偽の自信度を（自信度:パーセント）で追加してください。）（返答は必ずマークダウン形式にしてください。）`;
+
+        return { role, content: messageIndex === 0 ? systemPrompt : content };
+      });
+
+      // fieldsにapiからのresponseを表示する欄を作る
+      append({
+        role: "assistant",
+        content: "",
+        exampleIndex: 0,
+        messageIndex: fields.length,
+      });
+
+      const content = await fetchResponse(fixedMessages);
+
+      if (!content) throw new Error("返答がありませんでした。");
+
+      messages.push({
+        role: "assistant",
+        content,
+        exampleIndex: 0,
+        messageIndex: messages.length,
+      });
+
+      // 初回（messages.length < 4）は全て保存、2回目以降は最後の2つだけ保存
+      const createMessages = messages.filter((message, index) => {
+        if (messages.length < 4) {
+          return message;
+        } else if (
+          index === messages.length - 2 ||
+          index === messages.length - 1
+        ) {
+          return message;
+        }
+      });
+
+      await createMessage.mutateAsync({
+        messages: createMessages,
         promptId: promptId || createdPromptId,
       });
 
-      append({
+      setResponse("");
+
+      // apiからのresponseのstreamが終わったらfieldsを更新
+      update(fields.length, {
         role: "assistant",
         content,
         exampleIndex: 0,
@@ -89,61 +136,6 @@ const PromptForm: FC = () => {
       exampleIndex: 0,
       messageIndex: fields.length,
     });
-  };
-
-  // …………………………………………………
-  const [loading, setLoading] = useState(false);
-  const [input, setInput] = useState("こんにちは");
-  const [response, setResponse] = useState<string>("");
-
-  const prompt = `Q: ${input} Generate a response with less than 200 characters.`;
-
-  const generateResponse = async (e: React.MouseEvent<HTMLButtonElement>) => {
-    e.preventDefault();
-    setResponse("");
-    // setLoading(true);
-
-    const response = await fetch("/api/generate/route", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        prompt,
-      }),
-    });
-
-    if (!response.ok) {
-      throw new Error(response.statusText);
-    }
-
-    // This data is a ReadableStream
-    const data = response.body;
-    if (!data) {
-      return console.log("error");
-    }
-
-    const reader = data.getReader();
-    const decoder = new TextDecoder();
-    let done = false;
-
-    while (!done) {
-      const { value, done: doneReading } = await reader.read();
-      done = doneReading;
-      const chunkValue = decoder.decode(value);
-
-      const formattedJsonString = `[${chunkValue.replace(/}{/g, "},{")}]`;
-
-      const object = JSON.parse(formattedJsonString) as { content: string }[];
-
-      object.forEach((ob) => {
-        if (ob.content) {
-          setResponse((prev) => prev + ob.content);
-        }
-      });
-    }
-    console.log(response);
-    setLoading(false);
   };
 
   return (
@@ -223,13 +215,11 @@ const PromptForm: FC = () => {
                     />
                   </div>
 
-                  {fields[index]?.content &&
-                    errors.messages &&
-                    errors.messages[index]?.content && (
-                      <p className="w-full pb-2 text-left text-sm text-red-500">
-                        {errors.messages[index]?.content?.message}
-                      </p>
-                    )}
+                  {errors.messages && errors.messages[index]?.content && (
+                    <p className="w-full pb-2 text-left text-sm text-red-500">
+                      {errors.messages[index]?.content?.message}
+                    </p>
+                  )}
                 </div>
               );
 
@@ -242,14 +232,12 @@ const PromptForm: FC = () => {
                   >
                     返答
                   </label>
-                  <textarea
-                    id={`assistant${index}`}
-                    cols={10}
-                    rows={20}
-                    className="block w-full border-0 p-0 text-gray-900 placeholder:text-gray-400 sm:text-sm sm:leading-6"
-                    value={fields[index]?.content}
-                    disabled
-                  />
+
+                  <div className="mt-2">
+                    <Markdown
+                      response={(fields[index]?.content as string) || response}
+                    />
+                  </div>
                 </div>
               </div>
             );
@@ -258,10 +246,17 @@ const PromptForm: FC = () => {
             <div className="">
               <button
                 className="relative overflow-hidden rounded-lg bg-black px-28 py-6 ring-red-500/50 ring-offset-black will-change-transform focus:outline-none focus:ring-1 focus:ring-offset-2"
-                disabled={createPrompt.isLoading || createMessage.isLoading}
+                disabled={
+                  isLoading || createPrompt.isLoading || createMessage.isLoading
+                }
               >
                 <span className="absolute inset-px z-10 grid place-items-center rounded-lg bg-black bg-gradient-to-t from-neutral-800 text-neutral-200">
-                  AIからの応答を生成
+                  <span className="flex space-x-1">
+                    <span>AIからの応答を生成</span>
+                    {isLoading && (
+                      <span className="animate-pulse font-bold">...</span>
+                    )}
+                  </span>
                 </span>
                 <span
                   aria-hidden
@@ -275,38 +270,15 @@ const PromptForm: FC = () => {
                 type="button"
                 onClick={addMessage}
                 className="rounded-md bg-emerald-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-emerald-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-600"
+                disabled={
+                  isLoading || createPrompt.isLoading || createMessage.isLoading
+                }
               >
                 メッセージを追加
               </button>
             </div>
           )}
         </form>
-        {(createPrompt.isLoading || createMessage.isLoading) && (
-          <div className="mt-6 text-center">
-            <span className="relative inset-0 inline-flex h-6 w-6 animate-spin items-center justify-center rounded-full border-2 border-gray-300 after:absolute after:h-8 after:w-8 after:rounded-full after:border-2 after:border-x-transparent after:border-y-indigo-500"></span>
-          </div>
-        )}
-        {/* ………………………………………………… */}
-        {!loading ? (
-          <button
-            className="w-full rounded-xl bg-neutral-900 px-4 py-2 font-medium text-white hover:bg-black/80 mt-9"
-            onClick={(e) => generateResponse(e)}
-          >
-            Generate Response &rarr;
-          </button>
-        ) : (
-          <button
-            disabled
-            className="w-full rounded-xl bg-neutral-900 px-4 py-2 font-medium text-white"
-          >
-            <div className="animate-pulse font-bold tracking-widest">...</div>
-          </button>
-        )}
-        {response && (
-          <div className="mt-8 rounded-xl border bg-white p-4 shadow-md transition hover:bg-gray-100">
-            <Markdown response={response} />
-          </div>
-        )}
       </div>
     </div>
   );

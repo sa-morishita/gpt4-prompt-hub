@@ -21,7 +21,7 @@ export interface MessageFormType {
 
 export const messageFormSchema = z.object({
   messages: z.array(messageSchema),
-});
+}) satisfies z.ZodType<MessageFormType>;
 
 export interface PromptFormType {
   title: string;
