@@ -77,7 +77,7 @@ const PromptForm: FC = () => {
     //   messageIndex: fields.length,
     // });
 
-    const apiResponse = await fetch("/api/openai/nodegenerate", {
+    const apiResponse = await fetch("/api/openai/edgestream", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
