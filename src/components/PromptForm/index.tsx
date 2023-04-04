@@ -84,7 +84,7 @@ const PromptForm: FC = () => {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        prompt: "日本は好きですか？",
+        messages: fixedMessages,
       }),
     });
 

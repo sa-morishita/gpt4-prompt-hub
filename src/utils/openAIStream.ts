@@ -10,6 +10,7 @@ import {
   ParsedEvent,
   ReconnectInterval,
 } from "eventsource-parser";
+import { MessageType } from "~/models/prompt";
 
 export type ChatGPTAgent = "user" | "system";
 
@@ -20,7 +21,7 @@ export interface ChatGPTMessage {
 
 export interface OpenAIStreamPayload {
   model: string;
-  messages: ChatGPTMessage[];
+  messages: Omit<MessageType, "exampleIndex" | "messageIndex">[];
   temperature: number;
   top_p: number;
   frequency_penalty: number;
@@ -35,6 +36,8 @@ export async function OpenAIStream(payload: OpenAIStreamPayload) {
   const decoder = new TextDecoder();
 
   let counter = 0;
+
+  console.log(40, payload);
 
   const res = await fetch("https://api.openai.com/v1/chat/completions", {
     headers: {

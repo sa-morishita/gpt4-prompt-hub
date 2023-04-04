@@ -1,3 +1,4 @@
+import type { MessageType } from "~/models/prompt";
 import { OpenAIStream, type OpenAIStreamPayload } from "~/utils/openAIStream";
 
 if (!process.env.OPENAI_API_KEY) {
@@ -9,17 +10,17 @@ export const config = {
 };
 
 export default async function POST(req: Request): Promise<Response> {
-  const { prompt } = (await req.json()) as {
-    prompt?: string;
+  const { messages } = (await req.json()) as {
+    messages: Omit<MessageType, "exampleIndex" | "messageIndex">[];
   };
 
-  if (!prompt) {
+  if (!messages.length) {
     return new Response("No prompt in the request", { status: 400 });
   }
 
   const payload: OpenAIStreamPayload = {
-    model: "gpt-3.5-turbo",
-    messages: [{ role: "user", content: prompt }],
+    model: "gpt-4",
+    messages,
     temperature: 0.7,
     top_p: 1,
     frequency_penalty: 0,
