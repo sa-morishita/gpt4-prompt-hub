@@ -451,6 +451,70 @@ const PromptForm: FC = () => {
           wordwiseapi
         </button>
       </div>
+      <div>
+        <button
+          type="button"
+          className="bg-blue-500 p-3 m-3"
+          onClick={async () => {
+            console.log("start");
+
+            const messages = [
+              { role: "system", content: "返事してください" },
+              { role: "user", content: "こんにちは" },
+            ];
+
+            const apiResponse = await fetch("/api/openai/generate", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                messages,
+              }),
+            });
+            console.log(apiResponse);
+
+            if (!apiResponse.ok) {
+              throw new Error(apiResponse.statusText);
+            }
+
+            const data = apiResponse.body;
+            if (!data) {
+              throw new Error("データの取得に失敗しました。");
+            }
+
+            const reader = data.getReader();
+            const decoder = new TextDecoder();
+            let done = false;
+            let returnText = "";
+
+            while (!done) {
+              const { value, done: doneReading } = await reader.read();
+              done = doneReading;
+              const chunkValue = decoder.decode(value);
+
+              const formattedJsonString = `[${chunkValue.replace(
+                /}{/g,
+                "},{"
+              )}]`;
+
+              const object = JSON.parse(formattedJsonString) as {
+                content: string;
+              }[];
+
+              object.forEach((ob) => {
+                if (ob.content) {
+                  console.log(ob.content);
+                  returnText = returnText + ob.content;
+                  setResponse((prev) => prev + ob.content);
+                }
+              });
+            }
+          }}
+        >
+          wordwiseapi
+        </button>
+      </div>
     </div>
   );
 };

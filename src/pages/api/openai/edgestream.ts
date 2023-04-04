@@ -1,4 +1,5 @@
 import { OpenAI } from "openai-streams";
+import { env } from "~/env.mjs";
 
 export default async function handler() {
   const stream = await OpenAI(
@@ -13,7 +14,7 @@ export default async function handler() {
         { role: "user", content: "天気に関わるものでお願いします。" },
       ],
     },
-    { apiKey: process.env.OPENAI_API_KEY }
+    { apiKey: env.OPENAI_API_KEY }
   );
 
   return new Response(stream);
