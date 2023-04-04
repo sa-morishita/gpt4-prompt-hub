@@ -286,6 +286,7 @@ const PromptForm: FC = () => {
           type="button"
           className="bg-green-500 p-3 m-3"
           onClick={async () => {
+            console.log("start");
             const text1 = "explore";
 
             const response = await axios.post("/api/openai/getWordInfo", {
@@ -303,6 +304,7 @@ const PromptForm: FC = () => {
           type="button"
           className="bg-purple-500 p-3 m-3"
           onClick={async () => {
+            console.log("start");
             const response = await fetch("/api/openai/test", {
               method: "POST",
               body: JSON.stringify({ searched: "こんにちは" }),
@@ -350,6 +352,7 @@ const PromptForm: FC = () => {
           type="button"
           className="bg-orange-500 p-3 m-3"
           onClick={async () => {
+            console.log("start");
             const apiResponse = await fetch("/api/openai/nodegenerate", {
               method: "POST",
               headers: {
@@ -401,12 +404,14 @@ const PromptForm: FC = () => {
           type="button"
           className="bg-blue-500 p-3 m-3"
           onClick={async () => {
+            console.log("start");
             const apiResponse = await fetch("/api/openai/edgestream", {
               method: "POST",
               headers: {
                 "Content-Type": "application/json",
               },
             });
+
             console.log(apiResponse);
 
             const data = apiResponse.body;

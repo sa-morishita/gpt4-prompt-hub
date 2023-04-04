@@ -6,8 +6,8 @@ export default async function test(_: NextApiRequest, res: NextApiResponse) {
     "completions",
     {
       model: "text-davinci-003",
-      prompt: "Write a happy sentence.\n\n",
-      max_tokens: 25,
+      prompt: "人を楽しくさせる詩を書いてください。",
+      max_tokens: 250,
     },
     { apiKey: process.env.OPENAI_API_KEY }
   );
