@@ -27,7 +27,7 @@ export const useOpenAIApi = (): UseOpenAIApiResult => {
       try {
         logger.info("hooks messages", messages);
 
-        const apiResponse = await fetch("/api/openai/generate", {
+        const apiResponse = await fetch("/api/openai/openai", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -56,18 +56,8 @@ export const useOpenAIApi = (): UseOpenAIApiResult => {
           done = doneReading;
           const chunkValue = decoder.decode(value);
 
-          const formattedJsonString = `[${chunkValue.replace(/}{/g, "},{")}]`;
-
-          const object = JSON.parse(formattedJsonString) as {
-            content: string;
-          }[];
-
-          object.forEach((ob) => {
-            if (ob.content) {
-              returnText = returnText + ob.content;
-              setResponse((prev) => prev + ob.content);
-            }
-          });
+          returnText += chunkValue;
+          setResponse((prev) => prev + chunkValue);
         }
         logger.info("hooks returnText", returnText);
 
