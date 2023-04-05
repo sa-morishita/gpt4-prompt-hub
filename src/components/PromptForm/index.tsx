@@ -1,4 +1,5 @@
 import Markdown from "../Markdown";
+import { useOpenAIApi } from "./hooks";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useState, type FC } from "react";
 import { useFieldArray, useForm } from "react-hook-form";
@@ -14,8 +15,9 @@ const formSchema = z.intersection(promptFormSchema, messageFormSchema);
 const PromptForm: FC = () => {
   const [isSaved, setIsSaved] = useState<boolean>(false);
   const [promptId, setPromptId] = useState<string>("");
-  const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [response, setResponse] = useState<string>("");
+
+  const { isLoading, response, setResponse, error, fetchResponse } =
+    useOpenAIApi();
 
   const {
     register,
@@ -53,228 +55,79 @@ const PromptForm: FC = () => {
     },
   });
 
-  const onSubmit = async (formData: formType) => {
-    const { title, description, messages } = formData;
-    setResponse("");
-    // const messages = [
-    //   { role: "system", content: "返事してください" },
-    //   { role: "user", content: "こんにちは" },
-    // ];
+  const onSubmit = async (data: formType) => {
+    const { title, description, messages } = data;
 
-    const fixedMessages = messages.map((message) => {
-      const { role, content, messageIndex } = message;
+    try {
+      let createdPromptId = "";
+      if (fields.length === 2) {
+        const promptData = {
+          title,
+          description,
+        };
 
-      // const systemPrompt = `${content}（一番最後に返答内容の真偽の自信度を（自信度:パーセント）で追加してください。）（返答は必ずマークダウン形式にしてください。）`;
+        createdPromptId = await createPrompt.mutateAsync(promptData);
+        setPromptId(createdPromptId);
+      }
+      setIsSaved(true);
 
-      return { role, content };
-    });
+      const fixedMessages = messages.map((message) => {
+        const { role, content, messageIndex } = message;
 
-    console.log(71, fixedMessages);
+        const systemPrompt = `${content}（一番最後に返答内容の真偽の自信度を（自信度:パーセント）で追加してください。）（返答は必ずマークダウン形式にしてください。）`;
 
-    // append({
-    //   role: "assistant",
-    //   content: "",
-    //   exampleIndex: 0,
-    //   messageIndex: fields.length,
-    // });
+        return { role, content: messageIndex === 0 ? systemPrompt : content };
+      });
 
-    const apiResponse = await fetch("/api/openai/edgetest", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        messages: fixedMessages,
-      }),
-    });
+      // fieldsにapiからのresponseを表示する欄を作る
+      append({
+        role: "assistant",
+        content: "",
+        exampleIndex: 0,
+        messageIndex: fields.length,
+      });
 
-    console.log(88, apiResponse);
+      const content = await fetchResponse(fixedMessages);
 
-    const data = apiResponse.body;
-    if (!data) {
-      throw new Error("データの取得に失敗しました。");
-    }
+      if (!content) throw new Error("返答がありませんでした。");
 
-    const reader = data.getReader();
-    const decoder = new TextDecoder();
-    let done = false;
-    const fixedText = "";
+      messages.push({
+        role: "assistant",
+        content,
+        exampleIndex: 0,
+        messageIndex: messages.length,
+      });
 
-    while (!done) {
-      const { value, done: doneReading } = await reader.read();
-      done = doneReading;
-      const chunkValue = decoder.decode(value);
-      console.log(105, chunkValue);
+      // 初回（messages.length < 4）は全て保存、2回目以降は最後の2つだけ保存
+      const createMessages = messages.filter((message, index) => {
+        if (messages.length < 4) {
+          return message;
+        } else if (
+          index === messages.length - 2 ||
+          index === messages.length - 1
+        ) {
+          return message;
+        }
+      });
 
-      // if (chunkValue.startsWith("{") && chunkValue.endsWith("}")) {
-      //   const formattedJsonString = `[${chunkValue.replace(/}{/g, "},{")}]`;
+      await createMessage.mutateAsync({
+        messages: createMessages,
+        promptId: promptId || createdPromptId,
+      });
 
-      //   const object = JSON.parse(formattedJsonString) as {
-      //     content: string;
-      //   }[];
+      setResponse("");
 
-      //   object.forEach((ob) => {
-      //     if (ob.content) {
-      //       console.log(117, ob.content);
-      //       setResponse((prev) => prev + ob.content);
-      //     }
-      //   });
-      //   fixedText = "";
-      // } else {
-      //   fixedText += chunkValue;
-
-      //   if (fixedText.startsWith("{") && fixedText.endsWith("}")) {
-      //     const formattedJsonString = `[${fixedText.replace(/}{/g, "},{")}]`;
-
-      //     const object = JSON.parse(formattedJsonString) as {
-      //       content: string;
-      //     }[];
-
-      //     object.forEach((ob) => {
-      //       if (ob.content) {
-      //         console.log(134, ob.content);
-      //         setResponse((prev) => prev + ob.content);
-      //       }
-      //     });
-      //     fixedText = "";
-      //   }
-      // }
-
-      // const formattedJsonString = `[${chunkValue.replace(/}{/g, "},{")}]`;
-
-      // const object = JSON.parse(formattedJsonString) as {
-      //   content: string;
-      // }[];
-
-      // object.forEach((ob) => {
-      //   if (ob.content) {
-      //     console.log(ob.content);
-      //     setResponse((prev) => prev + ob.content);
-      //   }
-      // });
+      // apiからのresponseのstreamが終わったらfieldsを更新
+      update(fields.length, {
+        role: "assistant",
+        content,
+        exampleIndex: 0,
+        messageIndex: fields.length,
+      });
+    } catch (error) {
+      console.error(error);
     }
   };
-
-  // const onSubmit = async (data: formType) => {
-  //   const { title, description, messages } = data;
-
-  //   try {
-  //     // let createdPromptId = "";
-  //     // if (fields.length === 2) {
-  //     //   const promptData = {
-  //     //     title,
-  //     //     description,
-  //     //   };
-
-  //     //   createdPromptId = await createPrompt.mutateAsync(promptData);
-  //     //   setPromptId(createdPromptId);
-  //     // }
-  //     setIsSaved(true);
-
-  //     const fixedMessages = messages.map((message) => {
-  //       const { role, content, messageIndex } = message;
-
-  //       const systemPrompt = `${content}（一番最後に返答内容の真偽の自信度を（自信度:パーセント）で追加してください。）（返答は必ずマークダウン形式にしてください。）`;
-
-  //       return { role, content: messageIndex === 0 ? systemPrompt : content };
-  //     });
-
-  //     // fieldsにapiからのresponseを表示する欄を作る
-  //     append({
-  //       role: "assistant",
-  //       content: "",
-  //       exampleIndex: 0,
-  //       messageIndex: fields.length,
-  //     });
-
-  //     const apiResponse = await fetch("/api/openai/edgestream", {
-  //       method: "POST",
-  //       headers: {
-  //         "Content-Type": "application/json",
-  //       },
-  //       body: JSON.stringify({
-  //         messages,
-  //       }),
-  //     });
-
-  //     if (!apiResponse.ok) {
-  //       throw new Error(apiResponse.statusText);
-  //     }
-
-  //     const data = apiResponse.body;
-  //     if (!data) {
-  //       throw new Error("データの取得に失敗しました。");
-  //     }
-  //     console.log(48109, apiResponse);
-
-  //     const reader = data.getReader();
-  //     const decoder = new TextDecoder();
-  //     let done = false;
-  //     let returnText = "";
-
-  //     while (!done) {
-  //       const { value, done: doneReading } = await reader.read();
-  //       done = doneReading;
-  //       const chunkValue = decoder.decode(value);
-
-  //       const formattedJsonString = `[${chunkValue.replace(/}{/g, "},{")}]`;
-
-  //       const object = JSON.parse(formattedJsonString) as {
-  //         content: string;
-  //       }[];
-
-  //       object.forEach((ob) => {
-  //         if (ob.content) {
-  //           console.log(67129, ob.content);
-  //           returnText = returnText + ob.content;
-  //           setResponse2((prev) => prev + ob.content);
-  //         }
-  //       });
-  //     }
-
-  //     const content = await fetchResponse(fixedMessages);
-
-  //     console.log(93, content);
-
-  //     // if (!content) throw new Error("返答がありませんでした。");
-
-  //     messages.push({
-  //       role: "assistant",
-  //       content: content || "",
-  //       exampleIndex: 0,
-  //       messageIndex: messages.length,
-  //     });
-
-  //     // 初回（messages.length < 4）は全て保存、2回目以降は最後の2つだけ保存
-  //     const createMessages = messages.filter((message, index) => {
-  //       if (messages.length < 4) {
-  //         return message;
-  //       } else if (
-  //         index === messages.length - 2 ||
-  //         index === messages.length - 1
-  //       ) {
-  //         return message;
-  //       }
-  //     });
-
-  //     // await createMessage.mutateAsync({
-  //     //   messages: createMessages,
-  //     //   promptId: promptId || createdPromptId,
-  //     // });
-
-  //     setResponse("");
-
-  //     // apiからのresponseのstreamが終わったらfieldsを更新
-  //     update(fields.length, {
-  //       role: "assistant",
-  //       content: content || "",
-  //       exampleIndex: 0,
-  //       messageIndex: fields.length,
-  //     });
-  //   } catch (error) {
-  //     console.error(error);
-  //   }
-  // };
 
   const addMessage = () => {
     append({
@@ -427,7 +280,6 @@ const PromptForm: FC = () => {
           )}
         </form>
       </div>
-      <div className="text-green-500">{response}</div>
     </div>
   );
 };

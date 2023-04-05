@@ -27,7 +27,7 @@ export const useOpenAIApi = (): UseOpenAIApiResult => {
       try {
         logger.info("hooks messages", messages);
 
-        const apiResponse = await fetch("/api/openai/edgestream", {
+        const apiResponse = await fetch("/api/openai/generate", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -45,7 +45,6 @@ export const useOpenAIApi = (): UseOpenAIApiResult => {
         if (!data) {
           throw new Error("データの取得に失敗しました。");
         }
-        console.log(48, apiResponse);
 
         const reader = data.getReader();
         const decoder = new TextDecoder();
@@ -65,7 +64,6 @@ export const useOpenAIApi = (): UseOpenAIApiResult => {
 
           object.forEach((ob) => {
             if (ob.content) {
-              console.log(67, ob.content);
               returnText = returnText + ob.content;
               setResponse((prev) => prev + ob.content);
             }

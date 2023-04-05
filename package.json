@@ -31,7 +31,6 @@
     "eventsource-parser": "^1.0.0",
     "next": "^13.2.4",
     "next-auth": "^4.20.1",
-    "openai-streams": "^4.2.0",
     "pino": "^8.11.0",
     "pino-logflare": "^0.3.12",
     "react": "18.2.0",

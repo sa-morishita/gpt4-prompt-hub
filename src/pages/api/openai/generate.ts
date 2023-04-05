@@ -1,9 +1,17 @@
-import type { NextRequest } from "next/server";
-import { OpenAI } from "openai-streams";
 import { env } from "~/env.mjs";
+import type { OpenAIStreamPayload } from "~/models/openai";
 import type { MessageType } from "~/models/prompt";
+import { OpenAIStream } from "~/utils/openAIStream";
 
-export default async function handler(req: NextRequest) {
+if (!env.OPENAI_API_KEY) {
+  throw new Error("Missing env var from OpenAI");
+}
+
+export const config = {
+  runtime: "edge",
+};
+
+export default async function POST(req: Request): Promise<Response> {
   const { messages } = (await req.json()) as {
     messages: Omit<MessageType, "exampleIndex" | "messageIndex">[];
   };
@@ -14,18 +22,18 @@ export default async function handler(req: NextRequest) {
       statusText: "プロンプトがありません",
     });
 
-  const stream = await OpenAI(
-    "chat",
-    {
-      model: "gpt-4",
-      messages,
-    },
-    { apiKey: env.OPENAI_API_KEY }
-  );
+  const payload: OpenAIStreamPayload = {
+    model: env.OPENAI_API_MODEL,
+    messages,
+    temperature: 0.7,
+    top_p: 1,
+    frequency_penalty: 0,
+    presence_penalty: 0,
+    max_tokens: 1000,
+    stream: true,
+    n: 1,
+  };
 
+  const stream = await OpenAIStream(payload);
   return new Response(stream);
 }
-
-export const config = {
-  runtime: "edge",
-};

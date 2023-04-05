@@ -1,35 +1,14 @@
-/* eslint-disable @typescript-eslint/no-unsafe-argument */
-
-/* eslint-disable @typescript-eslint/no-unsafe-call */
-
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
-
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import {
   createParser,
-  ParsedEvent,
-  ReconnectInterval,
+  type ParsedEvent,
+  type ReconnectInterval,
 } from "eventsource-parser";
-import { MessageType } from "~/models/prompt";
-
-export type ChatGPTAgent = "user" | "system";
-
-export interface ChatGPTMessage {
-  role: ChatGPTAgent;
-  content: string;
-}
-
-export interface OpenAIStreamPayload {
-  model: string;
-  messages: Omit<MessageType, "exampleIndex" | "messageIndex">[];
-  temperature: number;
-  top_p: number;
-  frequency_penalty: number;
-  presence_penalty: number;
-  max_tokens: number;
-  stream: boolean;
-  n: number;
-}
+import type { BufferSource } from "stream/web";
+import { env } from "~/env.mjs";
+import type {
+  OpenAIStreamPayload,
+  OpenAIStreamResponse,
+} from "~/models/openai";
 
 export async function OpenAIStream(payload: OpenAIStreamPayload) {
   const encoder = new TextEncoder();
@@ -37,12 +16,10 @@ export async function OpenAIStream(payload: OpenAIStreamPayload) {
 
   let counter = 0;
 
-  console.log(40, payload);
-
   const res = await fetch("https://api.openai.com/v1/chat/completions", {
     headers: {
       "Content-Type": "application/json",
-      Authorization: `Bearer ${process.env.OPENAI_API_KEY ?? ""}`,
+      Authorization: `Bearer ${env.OPENAI_API_KEY ?? ""}`,
     },
     method: "POST",
     body: JSON.stringify(payload),
@@ -50,38 +27,34 @@ export async function OpenAIStream(payload: OpenAIStreamPayload) {
 
   const stream = new ReadableStream({
     async start(controller) {
-      // callback
       function onParse(event: ParsedEvent | ReconnectInterval) {
         if (event.type === "event") {
           const data = event.data;
-          // https://beta.openai.com/docs/api-reference/completions/create#completions/create-stream
           if (data === "[DONE]") {
             controller.close();
             return;
           }
           try {
-            const json = JSON.parse(data);
+            const json = JSON.parse(data) as OpenAIStreamResponse;
+
+            if (!json.choices[0]) return;
+
             const text = json.choices[0].delta?.content || "";
             if (counter < 2 && (text.match(/\n/) || []).length) {
-              // this is a prefix character (i.e., "\n\n"), do nothing
               return;
             }
             const queue = encoder.encode(text);
             controller.enqueue(queue);
             counter++;
           } catch (e) {
-            // maybe parse error
             controller.error(e);
           }
         }
       }
 
-      // stream response (SSE) from OpenAI may be fragmented into multiple chunks
-      // this ensures we properly read chunks and invoke an event for each SSE event stream
       const parser = createParser(onParse);
-      // https://web.dev/streams/#asynchronous-iteration
       for await (const chunk of res.body as any) {
-        parser.feed(decoder.decode(chunk));
+        parser.feed(decoder.decode(chunk as BufferSource));
       }
     },
   });
