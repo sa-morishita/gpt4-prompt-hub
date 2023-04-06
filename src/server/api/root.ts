@@ -1,5 +1,6 @@
 import { messageRouter } from "./routers/message";
 import { promptRouter } from "./routers/prompt";
+import { tagRouter } from "./routers/tag";
 import { createTRPCRouter } from "~/server/api/trpc";
 
 /**
@@ -10,6 +11,7 @@ import { createTRPCRouter } from "~/server/api/trpc";
 export const appRouter = createTRPCRouter({
   prompt: promptRouter,
   message: messageRouter,
+  tag: tagRouter,
 });
 
 // export type definition of API

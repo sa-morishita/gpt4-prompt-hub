@@ -26,9 +26,11 @@ export const messageFormSchema = z.object({
 export interface PromptFormType {
   title: string;
   description: string;
+  referenceUrl?: string;
 }
 
 export const promptFormSchema = z.object({
   title: z.string(),
   description: z.string(),
+  referenceUrl: z.string().optional(),
 }) satisfies z.ZodType<PromptFormType>;

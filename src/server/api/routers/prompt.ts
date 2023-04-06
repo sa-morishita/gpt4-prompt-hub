@@ -1,13 +1,29 @@
 import { createTRPCRouter, protectedProcedure } from "../trpc";
 import { TRPCError } from "@trpc/server";
+import { z } from "zod";
 import { env } from "~/env.mjs";
 import { promptFormSchema } from "~/models/prompt";
 
 export const promptRouter = createTRPCRouter({
   createPrompt: protectedProcedure
-    .input(promptFormSchema)
+    .input(
+      promptFormSchema.and(
+        z.object({
+          tagsIds: z
+            .array(
+              z.object({
+                id: z.string(),
+              })
+            )
+            .optional(),
+        })
+      )
+    )
     .mutation(
-      async ({ ctx: { prisma, session }, input: { title, description } }) => {
+      async ({
+        ctx: { prisma, session },
+        input: { title, description, referenceUrl, tagsIds },
+      }) => {
         const isUsed = await prisma.prompt.findUnique({
           where: {
             title,
@@ -17,7 +33,7 @@ export const promptRouter = createTRPCRouter({
         if (isUsed) {
           throw new TRPCError({
             code: "CONFLICT",
-            message: "title already exists!",
+            message: "このタイトルのプロンプトがすでに存在します",
           });
         }
 
@@ -25,11 +41,15 @@ export const promptRouter = createTRPCRouter({
           data: {
             title,
             description,
+            referenceUrl,
             model: env.OPENAI_API_MODEL,
             user: {
               connect: {
                 id: session.user.id,
               },
+            },
+            tags: {
+              connect: tagsIds,
             },
           },
         });
