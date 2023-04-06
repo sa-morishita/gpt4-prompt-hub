@@ -372,7 +372,9 @@ const PromptForm: FC = () => {
               <span className="absolute inset-px z-10 grid place-items-center rounded-lg bg-black bg-gradient-to-t from-neutral-800 text-neutral-200">
                 <span className="flex space-x-1">
                   <span>AIからの応答を生成</span>
-                  {isLoading && (
+                  {(isLoading ||
+                    createPrompt.isLoading ||
+                    createMessage.isLoading) && (
                     <span className="animate-pulse font-bold">...</span>
                   )}
                 </span>

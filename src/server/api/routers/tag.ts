@@ -5,7 +5,7 @@ import { tagCreateSchema } from "~/models/tag";
 export const tagRouter = createTRPCRouter({
   createTag: protectedProcedure
     .input(tagCreateSchema)
-    .mutation(async ({ ctx: { prisma }, input: { name, description } }) => {
+    .mutation(async ({ ctx: { prisma }, input: { name } }) => {
       const tag = await prisma.tag.findUnique({
         where: {
           name,
@@ -22,7 +22,6 @@ export const tagRouter = createTRPCRouter({
       await prisma.tag.create({
         data: {
           name,
-          description,
         },
       });
     }),

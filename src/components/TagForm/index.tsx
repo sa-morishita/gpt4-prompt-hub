@@ -17,7 +17,6 @@ const TagForm: FC = () => {
     formState: { errors },
   } = useForm<{
     name: string;
-    description: string;
   }>({
     resolver: zodResolver(tagCreateSchema),
   });
@@ -49,22 +48,20 @@ const TagForm: FC = () => {
         <p className="w-full pb-2 text-left text-sm text-red-500">
           {errors.name?.message}
         </p>
-        <input
-          type="text"
-          id="description"
-          className="h-full w-full rounded-xl border border-gray-300 p-4 outline-none focus:border-gray-600"
-          placeholder="概要"
-          {...register("description")}
-        />
-        <p className="w-full pb-2 text-left text-sm text-red-500">
-          {errors.description?.message}
-        </p>
         <div className="flex w-full justify-end">
           <button
             className="w-fit space-x-3 whitespace-nowrap rounded border border-gray-200 px-4 py-2 text-right text-sm transition hover:border-gray-900 hover:text-gray-900"
             type="submit"
           >
-            生成
+            {!createTag.isLoading ? (
+              "生成"
+            ) : (
+              <span className="inline-flex items-center gap-px">
+                <span className="animate-blink mx-px h-1.5 w-1.5 rounded-full bg-indigo-600"></span>
+                <span className="animate-blink mx-px h-1.5 w-1.5 rounded-full bg-indigo-600"></span>
+                <span className="animate-blink mx-px h-1.5 w-1.5 rounded-full bg-indigo-600"></span>
+              </span>
+            )}
           </button>
         </div>
       </form>

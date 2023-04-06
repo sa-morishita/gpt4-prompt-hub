@@ -1,4 +1,4 @@
-import { createTRPCRouter, protectedProcedure } from "../trpc";
+import { createTRPCRouter, protectedProcedure, publicProcedure } from "../trpc";
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 import { env } from "~/env.mjs";
@@ -56,4 +56,25 @@ export const promptRouter = createTRPCRouter({
         return newPrompt.id;
       }
     ),
+  getPrompts: publicProcedure.query(async ({ ctx: { prisma } }) => {
+    const prompts = await prisma.prompt.findMany({
+      orderBy: {
+        createdAt: "desc",
+      },
+      select: {
+        id: true,
+        title: true,
+        model: true,
+        description: true,
+        createdAt: true,
+        tags: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
+      },
+    });
+    return prompts;
+  }),
 });

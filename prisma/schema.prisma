@@ -97,14 +97,10 @@ model Message {
 }
 
 model Tag {
-    id          String   @id @default(cuid())
-    name        String   @unique
-    description String?  @db.Text
-    createdAt   DateTime @default(now())
-    updatedAt   DateTime @default(now()) @updatedAt
+    id        String   @id @default(cuid())
+    name      String   @unique
+    createdAt DateTime @default(now())
+    updatedAt DateTime @default(now()) @updatedAt
 
-    prompt   Prompt? @relation(fields: [promptId], references: [id])
-    promptId String?
-
-    @@index([promptId])
+    prompt Prompt[]
 }
