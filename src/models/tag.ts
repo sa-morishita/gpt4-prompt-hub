@@ -6,7 +6,7 @@ export interface TagType {
 }
 
 export const tagCreateSchema = z.object({
-  name: z.string().min(3),
+  name: z.string().min(2),
 });
 
 export interface TagsAutocompletionProps {
