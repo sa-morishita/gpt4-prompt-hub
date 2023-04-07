@@ -51,34 +51,34 @@ const Prompt: FC = () => {
           <div className="max-w-2xl mx-auto w-full">
             <div className="relative flex flex-col items-center justify-center space-y-4">
               <div className="w-full">
-                <div className="relative rounded-md rounded-b-none bg-white px-3 pb-1.5 pt-2.5 ring-1 ring-inset ring-gray-300 focus-within:z-10 focus-within:ring-2 focus-within:ring-indigo-600">
+                <div className="relative rounded-md rounded-b-none bg-white px-3 pb-1.5 pt-2.5 ring-1 ring-inset ring-gray-300">
                   <p className="block text-xs font-medium text-gray-600">
                     タイトル
                   </p>
-                  <p className="block w-full border-0 p-0 text-gray-900 placeholder:text-gray-400 prose">
+                  <p className="block w-full border-0 p-0 text-gray-900 prose">
                     {getPrompt.data.title}
                   </p>
                 </div>
               </div>
               <div className="w-full">
-                <div className="relative rounded-md rounded-b-none bg-white px-3 pb-1.5 pt-2.5 ring-1 ring-inset ring-gray-300 focus-within:z-10 focus-within:ring-2 focus-within:ring-indigo-600">
+                <div className="relative rounded-md rounded-b-none bg-white px-3 pb-1.5 pt-2.5 ring-1 ring-inset ring-gray-300">
                   <p className="block text-xs font-medium text-gray-600">
                     概要
                   </p>
-                  <p className="block w-full border-0 p-0 text-gray-900 placeholder:text-gray-400 focus:ring-0 prose">
+                  <p className="block w-full border-0 p-0 text-gray-900 prose whitespace-pre-wrap">
                     {getPrompt.data.description}
                   </p>
                 </div>
               </div>
               {getPrompt.data?.referenceUrl && (
                 <div className="w-full">
-                  <div className="relative rounded-md rounded-b-none bg-white px-3 pb-1.5 pt-2.5 ring-1 ring-inset ring-gray-300 focus-within:z-10 focus-within:ring-2 focus-within:ring-indigo-600">
+                  <div className="relative rounded-md rounded-b-none bg-white px-3 pb-1.5 pt-2.5 ring-1 ring-inset ring-gray-300">
                     <p className="block text-xs font-medium text-gray-600">
                       参考URL
                     </p>
                     <a
                       href={getPrompt.data.referenceUrl}
-                      className="block w-full border-0 p-0 text-blue-600 placeholder:text-gray-400 prose"
+                      className="block w-full border-0 p-0 text-blue-600 prose"
                       target="_blank"
                       rel="noreferrer"
                     >
@@ -112,7 +112,7 @@ const Prompt: FC = () => {
                   if (index === 0 || index % 2 === 1)
                     return (
                       <div key={index} className="w-full space-y-4">
-                        <div className="relative rounded-md rounded-b-none bg-white px-3 pb-1.5 pt-2.5 ring-1 ring-inset ring-gray-300 focus-within:z-10 focus-within:ring-2 focus-within:ring-indigo-600">
+                        <div className="relative rounded-md rounded-b-none bg-white px-3 pb-1.5 pt-2.5 ring-1 ring-inset ring-gray-300">
                           <div className="block text-xs font-medium text-gray-600">
                             <div className="flex w-full justify-between items-center">
                               {index === 0 ? (
@@ -139,7 +139,7 @@ const Prompt: FC = () => {
                               </button>
                             </div>
                           </div>
-                          <p className="block w-full border-0 px-0 py-2 text-gray-900 placeholder:text-gray-400 prose">
+                          <p className="block w-full border-0 px-0 py-2 text-gray-900 prose whitespace-pre-wrap">
                             {message.content}
                           </p>
                         </div>
@@ -148,7 +148,7 @@ const Prompt: FC = () => {
 
                   return (
                     <div key={index} className="w-full">
-                      <div className="relative rounded-md rounded-b-none bg-white px-3 pb-1.5 pt-2.5 ring-1 ring-inset ring-gray-300 focus-within:z-10 focus-within:ring-2 focus-within:ring-indigo-600">
+                      <div className="relative rounded-md rounded-b-none bg-white px-3 pb-1.5 pt-2.5 ring-1 ring-inset ring-gray-300">
                         <div className="block text-xs font-medium text-gray-600">
                           <div className="flex items-center">
                             <MemoizedGlobeAltIcon className="h-4 w-4" />
