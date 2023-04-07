@@ -78,7 +78,7 @@ const Prompt: FC = () => {
                     </p>
                     <a
                       href={getPrompt.data.referenceUrl}
-                      className="block w-full border-0 p-0 text-blue-600 prose"
+                      className="block w-full border-0 p-0 text-blue-600 prose overflow-hidden"
                       target="_blank"
                       rel="noreferrer"
                     >
