@@ -260,7 +260,7 @@ const PromptForm: FC = () => {
                 {selectedTags.map((tag) => (
                   <div
                     key={tag.id}
-                    className="whitespace-nowrap rounded-2xl bg-emerald-600 px-5 py-2 text-white text-xs"
+                    className="whitespace-nowrap rounded-2xl bg-emerald-600 px-5 py-2 text-white text-xs flex items-center justify-center space-x-2"
                   >
                     <div>{tag.name}</div>
                     <div
