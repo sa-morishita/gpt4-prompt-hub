@@ -6,10 +6,8 @@ import { api } from "~/utils/api";
 const PromptList: FC = () => {
   const getPrompts = api.prompt.getPrompts.useQuery();
 
-  console.log(getPrompts);
-
   return (
-    <div className="p-8 h-screen overflow-y-scroll w-full">
+    <>
       <div className="grid grid-cols-3 gap-4">
         {getPrompts.isSuccess &&
           getPrompts.data.map((prompt) => {
@@ -59,7 +57,7 @@ const PromptList: FC = () => {
             );
           })}
       </div>
-    </div>
+    </>
   );
 };
 

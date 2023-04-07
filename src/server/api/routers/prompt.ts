@@ -77,4 +77,46 @@ export const promptRouter = createTRPCRouter({
     });
     return prompts;
   }),
+  getPrompt: publicProcedure
+    .input(
+      z.object({
+        id: z.string(),
+      })
+    )
+    .query(async ({ ctx: { prisma }, input: { id } }) => {
+      const prompt = await prisma.prompt.findUnique({
+        where: {
+          id,
+        },
+        select: {
+          id: true,
+          title: true,
+          model: true,
+          description: true,
+          referenceUrl: true,
+          messages: {
+            select: {
+              role: true,
+              content: true,
+              exampleIndex: true,
+              messageIndex: true,
+            },
+          },
+          tags: {
+            select: {
+              id: true,
+              name: true,
+            },
+          },
+          createdAt: true,
+          user: {
+            select: {
+              name: true,
+            },
+          },
+        },
+      });
+
+      return prompt;
+    }),
 });

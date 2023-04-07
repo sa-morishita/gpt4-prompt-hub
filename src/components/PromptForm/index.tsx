@@ -102,7 +102,7 @@ const PromptForm: FC = () => {
       const fixedMessages = messages.map((message) => {
         const { role, content, messageIndex } = message;
 
-        const systemPrompt = `${content}（一番最後に返答内容の真偽の自信度を（自信度:パーセント）で追加してください。）（返答は必ずマークダウン形式にしてください。）`;
+        const systemPrompt = `${content}（返答の最後に、返答内容の自信度や正確さを10段階で評価し追加してください。）（返答は必ずマークダウン形式にしてください。）`;
 
         return { role, content: messageIndex === 0 ? systemPrompt : content };
       });
@@ -167,7 +167,7 @@ const PromptForm: FC = () => {
   };
 
   return (
-    <div className="p-8 h-screen overflow-y-scroll w-full">
+    <>
       <div className="max-w-2xl mx-auto w-full">
         <form
           className="relative flex flex-col items-center justify-center space-y-4"
@@ -387,7 +387,7 @@ const PromptForm: FC = () => {
           </div>
         </form>
       </div>
-    </div>
+    </>
   );
 };
 
