@@ -19,7 +19,7 @@ export default async function POST(req: Request): Promise<Response> {
   if (!messages.length)
     return new Response(null, {
       status: 404,
-      statusText: "プロンプトがありません",
+      statusText: "テキストがありません",
     });
 
   const payload: OpenAIStreamPayload = {

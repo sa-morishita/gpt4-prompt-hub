@@ -256,11 +256,11 @@ const PromptForm: FC = () => {
                   タグを生成
                 </button>
               </div>
-              <div className="my-4 flex w-full flex-wrap items-center space-x-2">
+              <div className="my-4 flex w-full flex-wrap items-center gap-2">
                 {selectedTags.map((tag) => (
                   <div
                     key={tag.id}
-                    className="flex items-center justify-center space-x-2 whitespace-nowrap rounded-2xl bg-emerald-600 px-5 py-2 text-white text-xs"
+                    className="whitespace-nowrap rounded-2xl bg-emerald-600 px-5 py-2 text-white text-xs"
                   >
                     <div>{tag.name}</div>
                     <div
@@ -346,7 +346,7 @@ const PromptForm: FC = () => {
             );
           })}
           {fields.length % 2 !== 0 && !isLoading && (
-            <div className="mx-auto w-full text-center">
+            <div className="text-center">
               <button
                 type="button"
                 onClick={addMessage}

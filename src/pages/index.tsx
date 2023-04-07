@@ -1,11 +1,11 @@
 import { type NextPage } from "next";
-import PromptForm from "~/components/PromptForm";
+import TagSearch from "~/components/TagSearch";
 import MainLayout from "~/layouts/MainLayout";
 
 const Home: NextPage = () => {
   return (
     <MainLayout>
-      <PromptForm />
+      <TagSearch />
     </MainLayout>
   );
 };

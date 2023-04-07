@@ -77,6 +77,41 @@ export const promptRouter = createTRPCRouter({
     });
     return prompts;
   }),
+  getPromptsWithTag: publicProcedure
+    .input(
+      z.object({
+        tagId: z.string(),
+      })
+    )
+    .query(async ({ ctx: { prisma }, input: { tagId } }) => {
+      const prompts = await prisma.prompt.findMany({
+        where: {
+          tags: {
+            some: {
+              id: tagId,
+            },
+          },
+        },
+        orderBy: {
+          createdAt: "desc",
+        },
+        select: {
+          id: true,
+          title: true,
+          model: true,
+          description: true,
+          createdAt: true,
+          tags: {
+            select: {
+              id: true,
+              name: true,
+            },
+          },
+        },
+      });
+      return prompts;
+    }),
+
   getPrompt: publicProcedure
     .input(
       z.object({
@@ -118,5 +153,18 @@ export const promptRouter = createTRPCRouter({
       });
 
       return prompt;
+    }),
+  deletePrompt: protectedProcedure
+    .input(
+      z.object({
+        id: z.string(),
+      })
+    )
+    .mutation(async ({ ctx: { prisma }, input: { id } }) => {
+      await prisma.prompt.delete({
+        where: {
+          id,
+        },
+      });
     }),
 });
