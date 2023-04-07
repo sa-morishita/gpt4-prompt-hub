@@ -65,7 +65,11 @@ const PromptForm: FC = () => {
 
   const createPrompt = api.prompt.createPrompt.useMutation({
     onError: (error) => {
-      toast.error(error.message);
+      toast.error(
+        error.message === "UNAUTHORIZED"
+          ? "サインインしてください"
+          : error.message
+      );
     },
   });
 
