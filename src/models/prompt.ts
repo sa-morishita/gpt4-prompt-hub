@@ -10,7 +10,7 @@ export interface MessageType {
 
 export const messageSchema = z.object({
   role: z.nativeEnum(Role),
-  content: z.string().min(3),
+  content: z.string().min(1),
   exampleIndex: z.number(),
   messageIndex: z.number(),
 }) satisfies z.ZodType<MessageType>;
