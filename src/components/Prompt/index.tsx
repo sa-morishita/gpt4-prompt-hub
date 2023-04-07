@@ -148,7 +148,7 @@ const Prompt: FC = () => {
 
                   return (
                     <div key={index} className="w-full">
-                      <div className="relative rounded-md rounded-b-none bg-white px-3 pb-1.5 pt-2.5 ring-1 ring-inset ring-gray-300">
+                      <div className="relative rounded-md rounded-b-none bg-purple-50 px-3 pb-1.5 pt-2.5 ring-1 ring-inset ring-gray-300">
                         <div className="block text-xs font-medium text-gray-600">
                           <div className="flex items-center">
                             <MemoizedGlobeAltIcon className="h-4 w-4" />
