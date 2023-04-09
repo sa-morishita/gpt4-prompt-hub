@@ -1,28 +1,98 @@
-# Create T3 App
+# PromptHub
 
-This is a [T3 Stack](https://create.t3.gg/) project bootstrapped with `create-t3-app`.
+Web 上に溢れている ChatGPT のプロンプト例を登録・整理できる Web アプリです。<br>
+OpenAI API の stream に対応しています。<br>
+Google アカウントで Signin するとプロンプトが登録できます。<br>
+現状の仕様ではデプロイした人の API キーで固定されるため、広く公開する際は改修する必要があります。
+<br>
+<br>
 
-## What's next? How do I make an app with this?
+この Web アプリは [T3 Stack](https://create.t3.gg/)をベースにして開発しています。
 
-We try to keep this project as simple as possible, so you can start with just the scaffolding we set up for you, and add additional things later when they become necessary.
+<br>
 
-If you are not familiar with the different technologies used in this project, please refer to the respective docs. If you still are in the wind, please join our [Discord](https://t3.gg/discord) and ask for help.
+## 技術スタック
 
-- [Next.js](https://nextjs.org)
-- [NextAuth.js](https://next-auth.js.org)
-- [Prisma](https://prisma.io)
-- [Tailwind CSS](https://tailwindcss.com)
-- [tRPC](https://trpc.io)
+- Next.js
+- TypeScript
+- Supabase
+- Prisma
+- tRPC
+- Auth.js
+- Tailwind CSS
+- Zod
+- Zustand
 
-## Learn More
+## 機能
 
-To learn more about the [T3 Stack](https://create.t3.gg/), take a look at the following resources:
+- タイトル、概要、参考 URL、タグにてプロンプト例を登録
+- OpenAI API を用いて登録例への GPT-4 からのレスポンスを生成し、例と合わせてデータベースに保存
+- 登録済みプロンプトの一覧表示
+- タグによる検索と管理
 
-- [Documentation](https://create.t3.gg/)
-- [Learn the T3 Stack](https://create.t3.gg/en/faq#what-learning-resources-are-currently-available) — Check out these awesome tutorials
+## 前提条件
 
-You can check out the [create-t3-app GitHub repository](https://github.com/t3-oss/create-t3-app) — your feedback and contributions are welcome!
+- Node.js
+- Docker
+- Supabase CLI
+- Prisma CLI
 
-## How do I deploy this?
+## セットアップ
 
-Follow our deployment guides for [Vercel](https://create.t3.gg/en/deployment/vercel), [Netlify](https://create.t3.gg/en/deployment/netlify) and [Docker](https://create.t3.gg/en/deployment/docker) for more information.
+1. このリポジトリをクローンします。
+
+```
+git clone https://github.com/sa-morishita/gpt4-prompt-hub
+```
+
+2. ディレクトリに移動します。
+
+```
+cd gpt-4-prompt-hub
+```
+
+3. npm パッケージをインストールします。
+
+```
+npm install
+```
+
+4. 環境変数を設定します。`.env.local`ファイルをプロジェクトのルートディレクトリに作成し、以下の内容を記述します。
+
+```
+DATABASE_URL=PrismaのURL
+NEXTAUTH_SECRET=openssl rand -base64 32で生成
+NEXTAUTH_URL="http://localhost:3000" or 本番環境URL
+
+GOOGLE_CLIENT_SECRET=Google APIのクライアントシークレット
+GOOGLE_CLIENT_ID=Google APIのクライアントID
+
+OPENAI_API_KEY=あなたの OpenAI_API キー
+OPENAI_API_MODEL=gpt-4 または使用するモデル
+
+
+NEXT_PUBLIC_LOGFLARE_API_KEY=あなたの Logflare のプロジェクトのAPIキー
+NEXT_PUBLIC_LOGFLARE_SOURCE_ID= あなたの Logflare のプロジェクトのSource ID
+```
+
+5. Supabase のローカルインスタンスを起動します。
+
+```
+supabase start
+```
+
+6. Prisma のデータベーススキーマを更新します。
+
+```
+npx prisma db push
+```
+
+7. 開発サーバーを起動します。
+
+```
+npm run dev
+```
+
+アプリケーションは`http://localhost:3000`でアクセスできるようになります。
+
+---
