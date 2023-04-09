@@ -147,6 +147,8 @@ const PromptForm: FC = () => {
         promptId: promptId || createdPromptId,
       });
 
+      // [ ] on-demand ISR
+
       setResponse("");
 
       // apiからのresponseのstreamが終わったらfieldsを更新
@@ -349,20 +351,25 @@ const PromptForm: FC = () => {
               </div>
             );
           })}
-          {fields.length % 2 !== 0 && !isLoading && (
-            <div className="text-center">
-              <button
-                type="button"
-                onClick={addMessage}
-                className="rounded-md bg-emerald-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-emerald-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-600"
-                disabled={
-                  isLoading || createPrompt.isLoading || createMessage.isLoading
-                }
-              >
-                メッセージを追加
-              </button>
-            </div>
-          )}
+          {fields.length % 2 !== 0 &&
+            (!isLoading ||
+              !createPrompt.isLoading ||
+              !createMessage.isLoading) && (
+              <div className="text-center">
+                <button
+                  type="button"
+                  onClick={addMessage}
+                  className="rounded-md bg-emerald-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-emerald-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-600"
+                  disabled={
+                    isLoading ||
+                    createPrompt.isLoading ||
+                    createMessage.isLoading
+                  }
+                >
+                  メッセージを追加
+                </button>
+              </div>
+            )}
           <div>
             <button
               className="relative overflow-hidden rounded-lg bg-black px-28 py-6 ring-red-500/50 ring-offset-black will-change-transform focus:outline-none focus:ring-1 focus:ring-offset-2"

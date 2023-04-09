@@ -16,7 +16,7 @@ const TagSearch: FC = () => {
 
   const getTags = api.tag.getTags.useQuery();
 
-  const getPromptsWithTag = api.prompt.getPromptsWithTag.useQuery(
+  const getPromptsWithTag = api.prompt.getPromptsByTag.useQuery(
     {
       tagId: selectTagId,
     },
