@@ -48,7 +48,7 @@ git clone https://github.com/sa-morishita/gpt4-prompt-hub
 2. ディレクトリに移動します。
 
 ```
-cd gpt-4-prompt-hub
+cd gpt4-prompt-hub
 ```
 
 3. npm パッケージをインストールします。
