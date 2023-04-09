@@ -44,8 +44,6 @@ const PromptPage: NextPage<{ promptId: string }> = ({ promptId }) => {
     }
   );
 
-  console.log(getPromptById);
-
   return (
     <MainLayout>
       {getPromptById.isLoading && (

@@ -352,9 +352,9 @@ const PromptForm: FC = () => {
             );
           })}
           {fields.length % 2 !== 0 &&
-            (!isLoading ||
-              !createPrompt.isLoading ||
-              !createMessage.isLoading) && (
+            !isLoading &&
+            !createPrompt.isLoading &&
+            !createMessage.isLoading && (
               <div className="text-center">
                 <button
                   type="button"
