@@ -17,7 +17,7 @@ import { z } from "zod";
 import type { MessageFormType, PromptFormType } from "~/models/prompt";
 import { messageFormSchema, promptFormSchema } from "~/models/prompt";
 import type { TagType } from "~/models/tag";
-import { api } from "~/utils/api";
+import { api, type RouterOutputs } from "~/utils/api";
 
 const MemoizedGlobeAltIcon = memo(GlobeAltIcon);
 const MemoizedCog8ToothIcon = memo(Cog8ToothIcon);
@@ -27,7 +27,13 @@ const MemoizedXMarkIcon = memo(XMarkIcon);
 type formType = PromptFormType & MessageFormType;
 const formSchema = z.intersection(promptFormSchema, messageFormSchema);
 
-const PromptForm: FC = () => {
+type TagsProps = RouterOutputs["tag"]["getTags"];
+
+interface Props {
+  tags: TagsProps;
+}
+
+const PromptForm: FC<Props> = ({ tags }) => {
   const [isSaved, setIsSaved] = useState<boolean>(false);
   const [promptId, setPromptId] = useState<string>("");
   const [selectedTags, setSelectedTags] = useState<TagType[]>([]);
@@ -60,8 +66,6 @@ const PromptForm: FC = () => {
     control,
     name: "messages",
   });
-
-  const getTags = api.tag.getTags.useQuery();
 
   const createPrompt = api.prompt.createPrompt.useMutation({
     onError: (error) => {
@@ -146,8 +150,6 @@ const PromptForm: FC = () => {
         messages: createMessages,
         promptId: promptId || createdPromptId,
       });
-
-      // [ ] on-demand ISR
 
       setResponse("");
 
@@ -243,47 +245,42 @@ const PromptForm: FC = () => {
               {errors.referenceUrl?.message}
             </p>
           </div>
-
-          {getTags.isSuccess && (
-            <>
-              <TagForm />
-              <div className="my-4 flex w-full items-center space-x-4">
-                <div className="z-10 w-4/5">
-                  <TagsAutocompletion
-                    tags={getTags.data}
-                    setSelectedTags={setSelectedTags}
-                    selectedTags={selectedTags}
-                  />
-                </div>
-                <button
-                  onClick={() => openModal()}
-                  className="space-x-3 whitespace-nowrap rounded border border-gray-200 px-4 py-2 text-sm transition bg-white hover:border-gray-900 hover:text-gray-900 ring-1 ring-inset ring-gray-300"
+          <TagForm />
+          <div className="my-4 flex w-full items-center space-x-4">
+            <div className="z-10 w-4/5">
+              <TagsAutocompletion
+                tags={tags}
+                setSelectedTags={setSelectedTags}
+                selectedTags={selectedTags}
+              />
+            </div>
+            <button
+              onClick={() => openModal()}
+              className="space-x-3 whitespace-nowrap rounded border border-gray-200 px-4 py-2 text-sm transition bg-white hover:border-gray-900 hover:text-gray-900 ring-1 ring-inset ring-gray-300"
+            >
+              タグを生成
+            </button>
+          </div>
+          <div className="my-4 flex w-full flex-wrap items-center gap-2">
+            {selectedTags.map((tag) => (
+              <div
+                key={tag.id}
+                className="whitespace-nowrap rounded-2xl bg-emerald-600 px-5 py-2 text-white text-xs flex items-center justify-center space-x-2"
+              >
+                <div>{tag.name}</div>
+                <div
+                  onClick={() =>
+                    setSelectedTags((prev) =>
+                      prev.filter((currTag) => currTag.id !== tag.id)
+                    )
+                  }
+                  className="cursor-pointer"
                 >
-                  タグを生成
-                </button>
+                  <MemoizedXMarkIcon className="h-4 w-4" />
+                </div>
               </div>
-              <div className="my-4 flex w-full flex-wrap items-center gap-2">
-                {selectedTags.map((tag) => (
-                  <div
-                    key={tag.id}
-                    className="whitespace-nowrap rounded-2xl bg-emerald-600 px-5 py-2 text-white text-xs flex items-center justify-center space-x-2"
-                  >
-                    <div>{tag.name}</div>
-                    <div
-                      onClick={() =>
-                        setSelectedTags((prev) =>
-                          prev.filter((currTag) => currTag.id !== tag.id)
-                        )
-                      }
-                      className="cursor-pointer"
-                    >
-                      <MemoizedXMarkIcon className="h-4 w-4" />
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </>
-          )}
+            ))}
+          </div>
 
           {fields.map((field, index) => {
             if (index === 0 || index % 2 === 1)

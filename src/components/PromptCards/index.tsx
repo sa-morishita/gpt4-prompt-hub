@@ -3,10 +3,10 @@ import Link from "next/link";
 import { type FC } from "react";
 import { type RouterOutputs } from "~/utils/api";
 
-type PromptProps = RouterOutputs["prompt"]["getPrompts"];
+type PromptsProps = RouterOutputs["prompt"]["getPrompts"];
 
 interface Props {
-  prompts: PromptProps;
+  prompts: PromptsProps;
 }
 
 const PromptCards: FC<Props> = ({ prompts }) => {
