@@ -123,7 +123,7 @@ const Prompt: FC<Props> = ({ prompt }) => {
                           </button>
                         </div>
                       </div>
-                      <p className="block w-full border-0 px-0 py-2 text-gray-900 prose whitespace-pre-wrap">
+                      <p className="block w-full border-0 px-0 py-2 text-gray-900 prose whitespace-pre-wrap break-words">
                         {message.content}
                       </p>
                     </div>
