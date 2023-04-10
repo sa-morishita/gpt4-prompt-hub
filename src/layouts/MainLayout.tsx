@@ -84,7 +84,7 @@ const MainLayout: FC<Props> = ({ children }: React.PropsWithChildren) => {
         <div className="hidden md:fixed md:inset-y-0 md:flex md:w-64 md:flex-col">
           <Sidebar />
         </div>
-        <div className="flex flex-1 flex-col md:pl-64 h-full">
+        <div className="flex flex-1 flex-col md:pl-64 h-screen overflow-y-scroll">
           <div className="sticky top-0 z-10 bg-white pl-1 pt-1 sm:pl-3 sm:pt-3 md:hidden shadow">
             <button
               type="button"
@@ -95,7 +95,7 @@ const MainLayout: FC<Props> = ({ children }: React.PropsWithChildren) => {
               <Bars3Icon className="h-6 w-6" aria-hidden="true" />
             </button>
           </div>
-          <main className="flex-1 px-9 pb-9 pt-3 md:pt-9 bg-gray-100 h-full overflow-y-scroll">
+          <main className="flex-1 px-9 pb-9 pt-3 md:pt-9 bg-gray-100">
             {children}
           </main>
         </div>
