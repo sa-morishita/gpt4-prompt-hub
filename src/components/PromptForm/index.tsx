@@ -308,7 +308,7 @@ const PromptForm: FC<Props> = ({ tags }) => {
                       id={`user${index}`}
                       cols={10}
                       rows={4}
-                      className="block w-full border-0 p-0 text-gray-900 placeholder:text-gray-400 prose"
+                      className="block w-full border-0 p-0 text-gray-900 placeholder:text-gray-400 lg:prose lg:placeholder:text-base placeholder:text-xs"
                       placeholder={
                         index === 0
                           ? "設定はコンテキストや動作を提供するために使用されます。システムメッセージで、AIの役割や回答すべきトピック、行動の制約などを指定できます。このメッセージは、会話の初期設定を行う際に特に役立ちます。"

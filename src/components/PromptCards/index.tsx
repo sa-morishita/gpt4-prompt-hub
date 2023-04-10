@@ -11,7 +11,7 @@ interface Props {
 
 const PromptCards: FC<Props> = ({ prompts }) => {
   return (
-    <div className="grid grid-cols-3 gap-4">
+    <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
       {prompts.map((prompt) => {
         const { id, title, model, description, createdAt, tags } = prompt;
 

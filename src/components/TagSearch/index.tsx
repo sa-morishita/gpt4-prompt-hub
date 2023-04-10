@@ -31,7 +31,7 @@ const TagSearch: FC<Props> = ({ tags }) => {
 
   return (
     <>
-      <div className="my-4 flex w-full flex-wrap items-center gap-4">
+      <div className="my-4 flex w-full flex-wrap items-center gap-2 lg:gap-4">
         {tags.map((tag) => (
           <button
             type="button"
@@ -39,7 +39,7 @@ const TagSearch: FC<Props> = ({ tags }) => {
             key={tag.id}
             className={`
                 ${tag.id === selectTagId ? "bg-emerald-900" : "bg-emerald-600"}
-                flex items-center justify-center space-x-2 whitespace-nowrap rounded-2xl px-5 py-2 text-white hover:bg-emerald-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-600
+                flex items-center justify-center space-x-2 whitespace-nowrap rounded-2xl px-5 py-2 text-white hover:bg-emerald-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-600 text-xs lg:text-base
                 `}
           >
             {tag.name}
