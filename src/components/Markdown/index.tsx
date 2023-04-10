@@ -32,7 +32,7 @@ const Markdown: FC<Props> = ({ response }) => {
   };
 
   const CustomTable = ({ children }: CustomComponentProps) => (
-    <table className="divide-y divide-gray-300 bg-slate-50">{children}</table>
+    <table className="divide-y divide-gray-300">{children}</table>
   );
 
   const CustomThead = ({ children }: CustomComponentProps) => (
@@ -48,15 +48,13 @@ const Markdown: FC<Props> = ({ response }) => {
   );
 
   const CustomTh = ({ children }: CustomComponentProps) => (
-    <th className="py-3.5 pl-4 pr-4 text-left text-sm font-bold text-gray-900 whitespace-nowrap">
+    <th className="p-1 lg:p-4 text-left text-sm font-bold text-gray-900 lg:whitespace-nowrap">
       {children}
     </th>
   );
 
   const CustomTd = ({ children }: CustomComponentProps) => (
-    <td className="py-4 px-4 pr-4 text-sm text-gray-900 break-words">
-      {children}
-    </td>
+    <td className="p-1 lg:p-4 text-sm text-gray-900 break-words">{children}</td>
   );
 
   return (

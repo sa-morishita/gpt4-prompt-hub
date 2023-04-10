@@ -95,7 +95,7 @@ const MainLayout: FC<Props> = ({ children }: React.PropsWithChildren) => {
               <Bars3Icon className="h-6 w-6" aria-hidden="true" />
             </button>
           </div>
-          <main className="flex-1 px-9 pb-9 pt-3 md:pt-9 bg-gray-100">
+          <main className="flex-1 px-9 pb-20 md:pb-9 pt-3 md:pt-9 bg-gray-100">
             {children}
           </main>
         </div>
