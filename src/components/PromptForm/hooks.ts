@@ -25,7 +25,8 @@ export const useOpenAIApi = (): UseOpenAIApiResult => {
       setError(null);
 
       try {
-        logger.info("hooks messages", messages);
+        logger.debug("hooks messages", messages);
+        logger.info("API stream開始");
 
         const apiResponse = await fetch("/api/openai/openai", {
           method: "POST",
@@ -59,7 +60,8 @@ export const useOpenAIApi = (): UseOpenAIApiResult => {
           returnText += chunkValue;
           setResponse((prev) => prev + chunkValue);
         }
-        logger.info("hooks returnText", returnText);
+        logger.debug("hooks returnText", returnText);
+        logger.info("API stream終了");
 
         return returnText;
       } catch (error) {
