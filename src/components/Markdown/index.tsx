@@ -59,7 +59,7 @@ const Markdown: FC<Props> = ({ response }) => {
 
   return (
     <ReactMarkdown
-      className="prose"
+      className="prose break-words"
       rehypePlugins={[rehypeRaw, rehypeSanitize, rehypeMathjax]}
       remarkPlugins={[remarkGfm, remarkMath]}
       components={{
