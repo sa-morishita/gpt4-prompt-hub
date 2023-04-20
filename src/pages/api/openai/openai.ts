@@ -30,7 +30,7 @@ export default async function POST(req: Request): Promise<Response> {
     frequency_penalty: 0,
     presence_penalty: 0,
     // [ ] Maxトークンの値
-    // max_tokens: 4000,
+    max_tokens: 8000,
     stream: true,
     n: 1,
   };

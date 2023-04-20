@@ -110,7 +110,7 @@ const PromptForm: FC<Props> = ({ tags }) => {
       const fixedMessages = messages.map((message) => {
         const { role, content, messageIndex } = message;
 
-        const systemPrompt = `${content}（内容の自信度や正確さを10段階で評価し（自信度:スコア）として最後に追加してください）（返答は必ずマークダウン形式にしてください）`;
+        const systemPrompt = `${content}（返答は必ずマークダウン形式）`;
 
         return { role, content: messageIndex === 0 ? systemPrompt : content };
       });
