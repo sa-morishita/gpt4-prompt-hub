@@ -25,12 +25,12 @@ export default async function POST(req: Request): Promise<Response> {
   const payload: OpenAIStreamPayload = {
     model: env.OPENAI_API_MODEL,
     messages,
-    temperature: 0.7,
-    top_p: 1,
+    temperature: 0.8,
+    top_p: 0.8,
     frequency_penalty: 0,
     presence_penalty: 0,
     // [ ] Maxトークンの値
-    max_tokens: 4000,
+    // max_tokens: 4000,
     stream: true,
     n: 1,
   };

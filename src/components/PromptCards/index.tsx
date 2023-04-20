@@ -17,7 +17,7 @@ const PromptCards: FC<Props> = ({ prompts }) => {
 
         return (
           <article
-            className="animate-background rounded-xl bg-gradient-to-r from-green-300 via-blue-500 to-purple-600 bg-[length:400%_400%] p-0.5 shadow-xl transition [animation-duration:_6s] hover:shadow-sm h-full"
+            className="animate-background rounded-xl bg-gradient-to-r from-green-300 via-blue-500 to-purple-600 bg-[length:400%_400%] p-0.5 transition [animation-duration:_6s] hover:shadow-xl h-full shadow-sm"
             key={id}
           >
             <div className="rounded-[10px] bg-white p-4 sm:p-6 h-full flex flex-col">
